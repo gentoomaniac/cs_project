@@ -11,22 +11,22 @@ namespace project
         {
             ushort value = 0;
             ushort returnv = 0;
-            RegisterPC PC = new RegisterPC();
+            CPU6510 cpu = new CPU6510();
 
             setupLogger();
             Console.WriteLine("Hello World!");
 
             value = 256;
-            PC.setValue(value);
-            returnv = PC.getValue();
+            cpu.PC = value;
+            returnv = cpu.PC;
 
             value = 65000;
-            PC.setValue(value);
-            returnv = PC.getValue();
+            cpu.PC = value;
+            returnv = cpu.PC;
 
             value = 257;
-            PC.setValue(value);
-            returnv = PC.getValue();
+            cpu.PC = value;
+            returnv = cpu.PC;
         }
 
         static void setupLogger()
