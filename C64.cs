@@ -9,6 +9,9 @@ using MOS;
 
 namespace commodore
 {
+    [Flags]
+    public enum Latch { LORAM = 0x01, HIRAM = 0x02, CHAREN = 0x04, }
+ 
     class C64
     {
         private CPU6510 cpu;
@@ -26,7 +29,7 @@ namespace commodore
         {
             log = log = NLog.LogManager.GetCurrentClassLogger();
 
-            cpu = new CPU6510();
+            cpu = new CPU6510(memory);
             memory = new byte[ushort.MaxValue+1];
 
             basicRom = new byte[8192];
@@ -39,9 +42,24 @@ namespace commodore
 
         public void initialize()
         {
-            Array.Copy(basicRom, 0x00, memory, 0xa000, basicRom.Length);
-            Array.Copy(characterRom, 0x00, memory, 0xd000, characterRom.Length);
-            Array.Copy(kernalRom, 0x00, memory, 0xe000, kernalRom.Length);
+            memory[0x00] = 0xff;
+            memory[0x01] = 0x07;
+            updateMemoryBanks();
+        }
+
+        /* Depending on the latch byte in memory this function will load the different ROMs into memory
+         https://www.c64-wiki.com/wiki/Bank_Switching#CPU_Control_Lines
+        */
+        public void updateMemoryBanks()
+        {
+            if ( (memory[0x01] & (byte)Latch.LORAM) != 0 )
+                Array.Copy(basicRom, 0x00, memory, 0xa000, basicRom.Length);
+            if ( (memory[0x01] & (byte)Latch.HIRAM) != 0 )
+                Array.Copy(kernalRom, 0x00, memory, 0xe000, kernalRom.Length);
+            if ( (memory[0x01] & (byte)Latch.CHAREN) != 0 )
+                log.Debug("ToDo: CHAREN is set, I/O should be mapped");
+            else
+                Array.Copy(characterRom, 0x00, memory, 0xd000, characterRom.Length);
         }
 
         public void dumpMemory(ushort offset, byte[] memory)

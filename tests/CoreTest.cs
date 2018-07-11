@@ -17,7 +17,8 @@ namespace CoreTests
         public void TestRegisterPCL()
         {
             byte value = 0;
-            CPU6510 cpu = new CPU6510();
+            byte[] blankMemory = new byte[65536];
+            CPU6510 cpu = new CPU6510(blankMemory);
 
             value = 0;
             cpu.PCL = value;
@@ -42,7 +43,8 @@ namespace CoreTests
         public void TestRegisterPCH()
         {
             byte value = 0;
-            CPU6510 cpu = new CPU6510();
+            byte[] blankMemory = new byte[65536];
+            CPU6510 cpu = new CPU6510(blankMemory);
 
             value = 0;
             cpu.PCH = value;
@@ -67,7 +69,8 @@ namespace CoreTests
         public void TestRegisterPC()
         {
             ushort value = 0;
-            CPU6510 cpu = new CPU6510();
+            byte[] blankMemory = new byte[65536];
+            CPU6510 cpu = new CPU6510(blankMemory);
 
             value = 0;
             cpu.PC = value;
@@ -91,6 +94,36 @@ namespace CoreTests
                 cpu.PC = value;
                 Assert.AreEqual(value, cpu.PC);
             }
+        }
+
+        [Test]
+        public void testORA()
+        {
+            byte oldA;
+            ushort addr = 0x002a;
+            byte[] blankMemory = new byte[65536];
+            CPU6510 cpu = new CPU6510(blankMemory);
+
+            blankMemory[addr] = 10;
+            cpu.A = 0x01;
+            oldA = cpu.A;
+            cpu.ORA(addr);
+            Assert.AreEqual((oldA|blankMemory[addr]), cpu.A);
+            Assert.AreEqual(0x00, cpu.P);
+
+            blankMemory[addr] = 0x00;
+            cpu.A = 0x00;
+            oldA = cpu.A;
+            cpu.ORA(addr);
+            Assert.AreEqual((oldA|blankMemory[addr]), cpu.A);
+            Assert.AreEqual(0x02, cpu.P);
+
+            blankMemory[addr] = 0x81;
+            cpu.A = 0x02;
+            oldA = cpu.A;
+            cpu.ORA(addr);
+            Assert.AreEqual((oldA|blankMemory[addr]), cpu.A);
+            Assert.AreEqual(0x80, cpu.P);
         }
     }
 }
