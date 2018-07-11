@@ -1,14 +1,26 @@
 ﻿using NLog;
 using System;
 
-using Core;
+using commodore;
+using MOS;
 
 namespace project
 {
     class Program
     {
-        static void OtherMain(string[] args)
+        static void Main(string[] args)
         {
+            setupLogger();
+            C64 c64 = new C64("/home/marco/git-private/cs_project/rom/basic.rom",
+                "/home/marco/git-private/cs_project/rom/character.rom",
+                "/home/marco/git-private/cs_project/rom/kernal.rom");
+            Logger log = NLog.LogManager.GetCurrentClassLogger();
+            //log.Debug(ushort.MaxValue);
+            //c64.dumpRoms();
+            c64.initialize();
+            c64.dumpMemory();
+
+            /*
             ushort value = 0;
             ushort returnv = 0;
             CPU6510 cpu = new CPU6510();
@@ -27,6 +39,7 @@ namespace project
             value = 257;
             cpu.PC = value;
             returnv = cpu.PC;
+            */
         }
 
         static void setupLogger()

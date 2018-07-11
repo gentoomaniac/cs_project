@@ -2,7 +2,7 @@ using System;
 
 using NUnit.Framework;
 
-using Core;
+using MOS;
 
 namespace CoreTests
 {
