@@ -110,32 +110,6 @@ namespace MOS
             this.memory = memory;
         }
 
-        /* Methods to resolve different adressing modes
-         */
-        // addressing, which is rather a "no addressing mode at all"-option: Instructions which do not address an arbitrary memory location only supports this mode.
-        private ushort impliedAdressing(ushort addr) {return 0;}
-        // addressing, supported by bit-shifting instructions, turns the "action" of the operation towards the accumulator.
-        //ToDo:
-        private ushort accumulatorAdressing(){return 0;}
-        // addressing, which refers to the byte immediately following the opcode for the instruction.
-        // ToDo: this is prob incorrect
-        private ushort immidiateAdressing(ushort addr) {return (ushort)(addr + 1);}
-        // addressing, which refers to a given 16-bit address
-        private ushort absoluteAdressing(ushort addr) {return addr;}
-        // absolute addressing, indexed by either the X and Y index registers: These adds the index register to a base address, forming the final "destination" for the operation.
-        private ushort indexedAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
-        // addressing, which is similar to absolute addressing, but only works on addresses within the zeropage.
-        private ushort zeropageAdressing(byte addr) {return (ushort)addr;}
-        // Effective address is zero page address plus the contents of the given register (X, or Y).
-        private ushort zeropageIndexedAdressing(byte addr, byte offset) {return (ushort)(addr + offset);}
-        // addressing, which uses a single byte to specify the destination of conditional branches ("jumps") within 128 bytes of where the branching instruction resides.
-        private ushort relativeAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
-        // addressing, which takes the content of a vector as its destination address.
-        private ushort absoluteIndirectAdressing(ushort addr) {return getWordFromMemory(addr);}
-        // addressing, which uses the X index register to select one of a range of vectors in zeropage and takes the address from that pointer. Extremely rarely used!
-        private ushort indexedIndirectAdressing() {return getWordFromZeropage(X);}
-        // addressing, which adds the Y index register to the contents of a pointer to obtain the address. Very flexible instruction found in anything but the most trivial machine language routines!
-        private ushort indirectIndexedAdressing(ushort addr){return getWordFromMemory((ushort)(getWordFromMemory(addr) + Y));}
         /* Maps opcodes to the actual commands and takes care of the different adressing modes
          */
         public void opcodeMapper(byte opcode)
@@ -143,6 +117,13 @@ namespace MOS
             switch(opcode)
             {
                 case 0x05:
+                    ORA(zeropageAdressing(getNextCodeByte()));
+                    break;
+                case 0x25:
+                    AND(zeropageAdressing(getNextCodeByte()));
+                    break;
+                case 0x45:
+                    EOR(zeropageAdressing(getNextCodeByte()));
                     break;
 
                 default:
@@ -199,5 +180,42 @@ namespace MOS
         {
             return getWordFromMemory(addr);
         }
+        /* get the next code byte from memory and increment PC */
+        private byte getNextCodeByte() {return memory[PC++];}
+        /* get the next code word from memory and increment PC accordingly */
+        private ushort getNextCodeWord()
+        {
+            ushort word = getWordFromMemory(PC);
+            PC += 2;
+            return word;
+        }
+
+        /* Methods to resolve different adressing modes
+         */
+        // ToDo: The 6502 bugs
+        // addressing, which is rather a "no addressing mode at all"-option: Instructions which do not address an arbitrary memory location only supports this mode.
+        private ushort impliedAdressing(ushort addr) {return 0;}
+        // addressing, supported by bit-shifting instructions, turns the "action" of the operation towards the accumulator.
+        //ToDo:
+        private ushort accumulatorAdressing(){return 0;}
+        // addressing, which refers to the byte immediately following the opcode for the instruction.
+        // ToDo: this is prob incorrect
+        private ushort immidiateAdressing(ushort addr) {return (ushort)(addr + 1);}
+        // addressing, which refers to a given 16-bit address
+        private ushort absoluteAdressing(ushort addr) {return addr;}
+        // absolute addressing, indexed by either the X and Y index registers: These adds the index register to a base address, forming the final "destination" for the operation.
+        private ushort indexedAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
+        // addressing, which is similar to absolute addressing, but only works on addresses within the zeropage.
+        private ushort zeropageAdressing(byte addr) {return (ushort)addr;}
+        // Effective address is zero page address plus the contents of the given register (X, or Y).
+        private ushort zeropageIndexedAdressing(byte addr, byte offset) {return (ushort)(addr + offset);}
+        // addressing, which uses a single byte to specify the destination of conditional branches ("jumps") within 128 bytes of where the branching instruction resides.
+        private ushort relativeAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
+        // addressing, which takes the content of a vector as its destination address.
+        private ushort absoluteIndirectAdressing(ushort addr) {return getWordFromMemory(addr);}
+        // addressing, which uses the X index register to select one of a range of vectors in zeropage and takes the address from that pointer. Extremely rarely used!
+        private ushort indexedIndirectAdressing() {return getWordFromZeropage(X);}
+        // addressing, which adds the Y index register to the contents of a pointer to obtain the address. Very flexible instruction found in anything but the most trivial machine language routines!
+        private ushort indirectIndexedAdressing(ushort addr){return getWordFromMemory((ushort)(getWordFromMemory(addr) + Y));}
     }
 }

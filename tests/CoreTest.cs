@@ -8,11 +8,6 @@ namespace CoreTests
 {
     public class RegisterTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void TestRegisterPCL()
         {
@@ -96,7 +91,7 @@ namespace CoreTests
             }
         }
     }
-    class testCommands
+    class CommandTests
     {
         [Test]
         public void testORA()
@@ -191,6 +186,33 @@ namespace CoreTests
             oldA = cpu.A;
             cpu.EOR(addr);
             Assert.AreEqual(0x80, cpu.P);
+        }
+    }
+
+    public class OpcodeTests
+    {
+        [Test]
+        public void testOpcodeMapper()
+        {
+            ushort addr = 0x0100;
+            byte[] memory = new byte[65536];
+            CPU6510 cpu = new CPU6510(memory);
+            Random rnd = new Random();
+            byte opcode;
+            byte oldA;
+
+            opcode = 0x05;    // ORA zeropage
+            for (int i = 0; i < 100; i++)
+            {
+                memory[addr] = (byte)rnd.Next(2,255);
+                cpu.PC = addr;
+                cpu.A = (byte)rnd.Next(0,255);
+                oldA = cpu.A;
+                memory[memory[addr]] = (byte)rnd.Next(0,255);
+        
+                cpu.opcodeMapper(opcode);
+                Assert.AreEqual((oldA|memory[memory[addr]]), cpu.A);
+            }
         }
     }
 }
