@@ -189,21 +189,21 @@ namespace CoreTests
         }
     }
 
-    public class OpcodeTests
+    public class OpcodeMapperTests
     {
         [Test]
-        public void testOpcodeMapper()
+        public void testORAZeropage()
         {
             ushort addr = 0x0100;
             byte[] memory = new byte[65536];
             CPU6510 cpu = new CPU6510(memory);
             Random rnd = new Random();
-            byte opcode;
+            byte opcode = 0x05;
             byte oldA;
 
-            opcode = 0x05;    // ORA zeropage
             for (int i = 0; i < 100; i++)
             {
+                // instruction byte after opcode
                 memory[addr] = (byte)rnd.Next(2,255);
                 cpu.PC = addr;
                 cpu.A = (byte)rnd.Next(0,255);
@@ -212,6 +212,31 @@ namespace CoreTests
         
                 cpu.opcodeMapper(opcode);
                 Assert.AreEqual((oldA|memory[memory[addr]]), cpu.A);
+            }
+        }
+
+        [Test]
+        public void testORAIndexed()
+        {
+            ushort addr = 0x0100;
+            byte[] memory = new byte[65536];
+            CPU6510 cpu = new CPU6510(memory);
+            Random rnd = new Random();
+            byte opcode = 0x15;
+            byte oldA;
+
+            for (int i = 0; i < 100; i++)
+            {
+                // instruction byte after opcode
+                memory[addr] = (byte)rnd.Next(2,ushort.MaxValue);
+                cpu.PC = addr;
+                cpu.A = (byte)rnd.Next(0,255);
+                cpu.X = (byte)rnd.Next(0,255);
+                oldA = cpu.A;
+                memory[memory[addr]+cpu.X] = (byte)rnd.Next(0,255);
+        
+                cpu.opcodeMapper(opcode);
+                Assert.AreEqual((oldA|memory[memory[addr]+cpu.X]), cpu.A);
             }
         }
     }

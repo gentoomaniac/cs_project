@@ -119,6 +119,9 @@ namespace MOS
                 case 0x05:
                     ORA(zeropageAdressing(getNextCodeByte()));
                     break;
+                case 0x15:
+                    ORA(indexedAdressing(getNextCodeWord(), X));
+                    break;
                 case 0x25:
                     AND(zeropageAdressing(getNextCodeByte()));
                     break;
@@ -171,15 +174,21 @@ namespace MOS
                 P = (byte)(P & (byte)(0xff ^ (byte)s));
         }
 
-        private ushort getWordFromMemory(ushort addr)
+        private ushort getWordFromMemory(ushort lo, ushort hi)
         {
-            ushort word = (ushort)(((ushort)memory[addr+1]) << 8);
-            return (ushort)(word | (ushort)memory[addr]);
+            ushort word = (ushort)(((ushort)memory[lo]) << 8);
+            return (ushort)(word | (ushort)memory[hi]);
         }
-        private ushort getWordFromZeropage(byte addr)
+        private ushort getWordFromMemory(ushort addr, bool pageBoundry=false)
         {
-            return getWordFromMemory(addr);
+            // if we ignore page boundries or the second byte is still on the same page
+            if (!pageBoundry || (addr%256) < PAGE_SIZE-1)
+                return getWordFromMemory(addr, (ushort)(addr+1));
+            // otherwise take the pages 0x00 address for the high byte (see http://www.oxyron.de/html/opcodes02.html "The 6502 bugs")
+            else
+                return getWordFromMemory(addr, (ushort)((addr/(PAGE_SIZE-1)) << 8));
         }
+        private ushort getWordFromZeropage(byte addr) {return getWordFromMemory(addr, pageBoundry:true);}
         /* get the next code byte from memory and increment PC */
         private byte getNextCodeByte() {return memory[PC++];}
         /* get the next code word from memory and increment PC accordingly */
