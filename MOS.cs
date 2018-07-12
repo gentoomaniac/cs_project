@@ -1,5 +1,7 @@
 using NLog;
 
+using Exceptions;
+
 namespace MOS
 {
     public enum ProcessorStatus {
@@ -16,20 +18,6 @@ namespace MOS
 
     class CPU6510
     {
-        public delegate void CommandFunc(params object[] parameters);
-        public delegate ushort AdressingResolverFunc(params object[] parameters);
-        struct OpCode
-        {
-
-            public CommandFunc commandFunc;
-            public AdressingResolverFunc adressingResolverFunc;
-
-            public OpCode(CommandFunc cmdF, AdressingResolverFunc arf)
-            {
-                commandFunc = cmdF;
-                adressingResolverFunc = arf;
-            }
-        }
         private static ushort PAGE_SIZE;
 
         static CPU6510()
@@ -111,8 +99,7 @@ namespace MOS
             having to use self-modifying code. */
         public byte Y;
 
-        private byte[] memory; 
-        private OpCode[] opcodes;
+        private byte[] memory;
 
         private Logger log;
 
@@ -121,14 +108,6 @@ namespace MOS
             log = NLog.LogManager.GetCurrentClassLogger();
 
             this.memory = memory;
-            initializeOpcodes();
-        }
-
-        private void initializeOpcodes()
-        {
-            opcodes = new OpCode[256];
-            opcodes[0x05] = new OpCode(ORA, zeropageAdressing);
-
         }
 
         /* Methods to resolve different adressing modes
@@ -140,44 +119,35 @@ namespace MOS
         private ushort accumulatorAdressing(){return 0;}
         // addressing, which refers to the byte immediately following the opcode for the instruction.
         // ToDo: this is prob incorrect
-        private ushort immidiateAdressing(object[] par) {return (ushort)(((ushort)par[0]) + 1);}
+        private ushort immidiateAdressing(ushort addr) {return (ushort)(addr + 1);}
         // addressing, which refers to a given 16-bit address
-        private ushort absoluteAdressing(object[] par) {return (ushort)par[0];}
+        private ushort absoluteAdressing(ushort addr) {return addr;}
         // absolute addressing, indexed by either the X and Y index registers: These adds the index register to a base address, forming the final "destination" for the operation.
-        private ushort indexedAdressing(object[] par) {return (ushort)(((ushort)par[0]) + ((byte)par[1]));}
+        private ushort indexedAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
         // addressing, which is similar to absolute addressing, but only works on addresses within the zeropage.
-        private ushort zeropageAdressing(object[] par) {return (ushort)par[0];}
+        private ushort zeropageAdressing(byte addr) {return (ushort)addr;}
         // Effective address is zero page address plus the contents of the given register (X, or Y).
-        private ushort zeropageIndexedAdressing(object[] par) {return (ushort)(((ushort)par[0]) + ((byte)par[1]));}
+        private ushort zeropageIndexedAdressing(byte addr, byte offset) {return (ushort)(addr + offset);}
         // addressing, which uses a single byte to specify the destination of conditional branches ("jumps") within 128 bytes of where the branching instruction resides.
-        private ushort relativeAdressing(object[] par) {return (ushort)(P + ((byte)par[0]));}
+        private ushort relativeAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
         // addressing, which takes the content of a vector as its destination address.
-        private ushort absoluteIndirectAdressing(object[] par)
-        {
-            ushort finalAddr = (ushort)(((ushort)memory[((ushort)par[0])+1]) << 8);
-            return (ushort)(finalAddr | (ushort)memory[(ushort)par[0]]);
-        }
+        private ushort absoluteIndirectAdressing(ushort addr) {return getWordFromMemory(addr);}
         // addressing, which uses the X index register to select one of a range of vectors in zeropage and takes the address from that pointer. Extremely rarely used!
-        private ushort indexedIndirectAdressing(object[] par)
-        {
-            ushort finalAddr = (ushort)(((ushort)memory[X+1]) << 8);
-            return (ushort)(finalAddr | (ushort)memory[X]);
-        }
+        private ushort indexedIndirectAdressing() {return getWordFromZeropage(X);}
         // addressing, which adds the Y index register to the contents of a pointer to obtain the address. Very flexible instruction found in anything but the most trivial machine language routines!
-        private ushort indirectIndexedAdressing(object[] par)
-        {
-            ushort tmpAddr = (ushort)(((ushort)memory[((ushort)par[0])+1]) << 8);
-            tmpAddr |= (ushort)memory[((ushort)par[0])];
-            tmpAddr += Y;
-
-            ushort finalAddr = (ushort)(((ushort)memory[tmpAddr+1]) << 8);
-            return (ushort)(finalAddr | (ushort)memory[tmpAddr]);
-        }
+        private ushort indirectIndexedAdressing(ushort addr){return getWordFromMemory((ushort)(getWordFromMemory(addr) + Y));}
         /* Maps opcodes to the actual commands and takes care of the different adressing modes
          */
         public void opcodeMapper(byte opcode)
         {
+            switch(opcode)
+            {
+                case 0x05:
+                    break;
 
+                default:
+                    throw new IllegalOpcodeException(string.Format("{0} is an illigal Opcode", opcode.ToString("x2")));
+            }
         }
 
         /* Logical and arithmetic commands */
@@ -210,12 +180,24 @@ namespace MOS
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
         }
 
+
+        /* HELPERS */
         private void setProcessorStatusBit(ProcessorStatus s, bool isSet = true)
         {
             if (isSet)
                 P = (byte)(P | (byte)s);
             else 
                 P = (byte)(P & (byte)(0xff ^ (byte)s));
+        }
+
+        private ushort getWordFromMemory(ushort addr)
+        {
+            ushort word = (ushort)(((ushort)memory[addr+1]) << 8);
+            return (ushort)(word | (ushort)memory[addr]);
+        }
+        private ushort getWordFromZeropage(byte addr)
+        {
+            return getWordFromMemory(addr);
         }
     }
 }
