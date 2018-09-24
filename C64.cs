@@ -31,6 +31,7 @@ namespace commodore
         private byte[] memory;
         private Thread systemClockThread;
         private int systemClockRate;
+        private Mutex cpuMutex;
 
         // flag to indicate online state. Used for instance in the system clock.
         private bool powerSwitch;
@@ -39,7 +40,6 @@ namespace commodore
         private byte[] basicRom;
         private byte[] characterRom;
         private byte[] kernalRom;
-
 
         private Logger log;
 
@@ -68,16 +68,16 @@ namespace commodore
             log.Debug("Initializing system");
             powerSwitch = true;
 
-            log.Debug("Creating system clock thread ...");
-            ThreadStart systemClock = new ThreadStart(systemClockRunner);
-            systemClockThread = new Thread(systemClock);
-            systemClockThread.Start();
-
             log.Debug("Initializing memory ...");
             memory[0x00] = 0xff;
             memory[0x01] = 0x07;
             log.Debug("Updating memory banks ...");
             updateMemoryBanks();
+
+            log.Debug("Creating system clock thread ...");
+            ThreadStart systemClock = new ThreadStart(systemClockRunner);
+            systemClockThread = new Thread(systemClock);
+            systemClockThread.Start();
         }
         public void powerOff()
         {
@@ -153,11 +153,18 @@ namespace commodore
 
         private void systemClockRunner()
         {
-            log.Debug("... system clock running");
+            cpuMutex = cpu.getSystemClockMutex();
+            cpuMutex.WaitOne();
+
+            log.Debug("... system clock started");
             while(powerSwitch){
                 Thread.Sleep(1000);  // ToDo: this is just a placeholder
                 log.Debug("SystemClock: Tick!");
+                cpuMutex.ReleaseMutex();
+                cpuMutex.WaitOne();
             }
+
+            cpuMutex.ReleaseMutex();
             log.Debug("... system clock ended");
         }
     }

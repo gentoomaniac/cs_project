@@ -1,3 +1,5 @@
+using System.Threading;
+
 using NLog;
 
 using Exceptions;
@@ -95,6 +97,7 @@ namespace MOS
         public byte Y;
 
         private byte[] memory;
+        private Mutex systemClockMutex;
 
         private Logger log;
 
@@ -103,6 +106,12 @@ namespace MOS
             log = NLog.LogManager.GetCurrentClassLogger();
 
             this.memory = memory;
+            this.systemClockMutex = new Mutex(true, "CPU6510");
+        }
+
+        public Mutex getSystemClockMutex()
+        {
+            return systemClockMutex;
         }
 
         /* Maps opcodes to the actual commands and takes care of the different adressing modes
@@ -175,10 +184,19 @@ namespace MOS
                 P = (byte)(P & (byte)(0xff ^ (byte)s));
         }
 
+        private byte getByteFromMemory(ushort addr)
+        {
+            byte b;
+            systemClockMutex.WaitOne();
+            b = memory[addr];
+            systemClockMutex.ReleaseMutex();
+            return b;
+        }
+
         private ushort getWordFromMemory(ushort lo, ushort hi)
         {
-            ushort word = (ushort)(((ushort)memory[lo]) << 8);
-            return (ushort)(word | (ushort)memory[hi]);
+            ushort word = (ushort)(((ushort)getByteFromMemory(lo)) << 8);
+            return (ushort)(word | (ushort)getByteFromMemory(hi));
         }
         private ushort getWordFromMemory(ushort addr, bool pageBoundry=false)
         {
@@ -191,14 +209,7 @@ namespace MOS
         }
         private ushort getWordFromZeropage(byte addr) {return getWordFromMemory(addr, pageBoundry:true);}
         /* get the next code byte from memory and increment PC */
-        private byte getNextCodeByte() {return memory[PC++];}
-        /* get the next code word from memory and increment PC accordingly */
-        private ushort getNextCodeWord()
-        {
-            ushort word = getWordFromMemory(PC);
-            PC += 2;
-            return word;
-        }
+        private byte getNextCodeByte() {return getByteFromMemory(PC++);}
 
         /* Methods to resolve different adressing modes
          */

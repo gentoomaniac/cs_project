@@ -20,7 +20,7 @@ namespace project
             //c64.dumpRoms();
             c64.powerOn();
             // c64.dumpMemory();
-            Thread.Sleep(5000);
+            Thread.Sleep(60000);
             c64.powerOff();
 
             /*
