@@ -28,7 +28,6 @@ namespace Y1
             ThreadStart systemClock = new ThreadStart(systemClockRunner);
             systemClockThread = new Thread(systemClock);
             systemClockThread.Start();
-            log.Debug("system clock running.");
         }
 
         public void stop(bool blocking=true)
@@ -42,14 +41,17 @@ namespace Y1
 
         private void systemClockRunner()
         {
+            log.Debug("initially locking cpu ...");
             cpuMutex.WaitOne();
 
             log.Debug("... system clock started");
             while(doRun){
-                Thread.Sleep(1000);  // ToDo: this is just a placeholder
-                log.Debug("SystemClock: Tick!");
+                Thread.Sleep(100);  // ToDo: this is just a placeholder
+                log.Debug("SystemClock tick:");
                 cpuMutex.ReleaseMutex();
+                log.Debug("- cpu mutex released");
                 cpuMutex.WaitOne();
+                log.Debug("- cpu mutex acquired");
             }
 
             cpuMutex.ReleaseMutex();

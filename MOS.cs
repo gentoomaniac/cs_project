@@ -107,6 +107,7 @@ namespace MOS
 
             this.memory = memory;
             this.systemClockMutex = new Mutex(true, "CPU6510");
+            systemClockMutex.ReleaseMutex();
         }
 
         public Mutex getSystemClockMutex()
