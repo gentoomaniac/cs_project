@@ -99,15 +99,36 @@ namespace MOS
         private byte[] memory;
         private Mutex systemClockMutex;
 
+        private Thread executionLoopThread;
+        private bool exitExecutionLoop;
+
         private Logger log;
 
         public CPU6510(byte[] memory)
         {
             log = NLog.LogManager.GetCurrentClassLogger();
+            exitExecutionLoop = false;
 
             this.memory = memory;
             this.systemClockMutex = new Mutex(true, "CPU6510");
             systemClockMutex.ReleaseMutex();
+        }
+
+        public void start()
+        {
+            log.Debug("starting execution loop thread ...");
+            ThreadStart execChild = new ThreadStart(executionLoop);
+            executionLoopThread = new Thread(execChild);
+            executionLoopThread.Start();
+        }
+
+        public void stop(bool blocking=true)
+        {
+            log.Debug("stopping execution loop thread ...");
+            exitExecutionLoop = true;
+            if (blocking)
+                executionLoopThread.Join();
+            log.Debug("execution loop stopped.");
         }
 
         public Mutex getSystemClockMutex()
@@ -209,8 +230,15 @@ namespace MOS
                 return getWordFromMemory(addr, (ushort)((addr/(PAGE_SIZE-1)) << 8));
         }
         private ushort getWordFromZeropage(byte addr) {return getWordFromMemory(addr, pageBoundry:true);}
-        /* get the next code byte from memory and increment PC */
+
+        /* get the next code byte/word from memory and increment PC */
         private byte getNextCodeByte() {return getByteFromMemory(PC++);}
+        private ushort getNextCodeWord()
+        {
+            ushort word = getWordFromMemory(PC, (ushort)(PC+1));
+            PC += 2;
+            return word;
+        }
 
         /* Methods to resolve different adressing modes
          */
@@ -245,5 +273,13 @@ namespace MOS
             );
         }
         private byte indirectIndexedZeropageAdressing(byte addr){return (byte)(indirectIndexedAdressing(addr, pageBoundry:true));}
+
+        private void executionLoop()
+        {
+            while(!exitExecutionLoop)
+            {
+                opcodeMapper(getNextCodeByte());
+            }
+        }
     }
 }

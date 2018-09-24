@@ -78,6 +78,7 @@ namespace commodore
             log.Debug("Updating memory banks ...");
             updateMemoryBanks();
 
+            cpu.start();
             y1.start();
         }
 
@@ -86,6 +87,7 @@ namespace commodore
             log.Debug("powering off system ...");
             powerSwitch = false;
 
+            cpu.stop();
             y1.stop();
             log.Debug("system powered off!");
         }
@@ -107,7 +109,7 @@ namespace commodore
 
         public void loadToMemory(byte[] src, ushort offset)
         {
-            Array.Copy(src, 0x00, memory, offset, src.length);
+            Array.Copy(src, 0x00, memory, offset, src.Length);
         }
 
         public void dumpMemory(ushort offset, byte[] memory)

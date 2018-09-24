@@ -20,6 +20,8 @@ namespace Y1
             doRun = true;
 
             this.cpuMutex = cpuMutex;
+            log.Debug("initially locking cpu ...");
+            cpuMutex.WaitOne();
         }
 
         public void start()
@@ -41,9 +43,6 @@ namespace Y1
 
         private void systemClockRunner()
         {
-            log.Debug("initially locking cpu ...");
-            cpuMutex.WaitOne();
-
             log.Debug("... system clock started");
             while(doRun){
                 Thread.Sleep(100);  // ToDo: this is just a placeholder
