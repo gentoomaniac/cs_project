@@ -116,11 +116,17 @@ namespace MOS
         {
             switch(opcode)
             {
+                case 0x01:
+                    ORA(indexedIndirectAdressing(getNextCodeByte()));
+                    break;
                 case 0x05:
                     ORA(zeropageAdressing(getNextCodeByte()));
                     break;
+                case 0x11:
+                    ORA(indirectIndexedZeropageAdressing(getNextCodeByte()));
+                    break;
                 case 0x15:
-                    ORA(indexedAdressing(getNextCodeWord(), X));
+                    ORA(zeropageIndexedAdressing(getNextCodeByte(), X));
                     break;
                 case 0x25:
                     AND(zeropageAdressing(getNextCodeByte()));
@@ -182,7 +188,7 @@ namespace MOS
         private ushort getWordFromMemory(ushort addr, bool pageBoundry=false)
         {
             // if we ignore page boundries or the second byte is still on the same page
-            if (!pageBoundry || (addr%256) < PAGE_SIZE-1)
+            if (!pageBoundry || (addr%PAGE_SIZE) < PAGE_SIZE-1)
                 return getWordFromMemory(addr, (ushort)(addr+1));
             // otherwise take the pages 0x00 address for the high byte (see http://www.oxyron.de/html/opcodes02.html "The 6502 bugs")
             else
@@ -223,8 +229,14 @@ namespace MOS
         // addressing, which takes the content of a vector as its destination address.
         private ushort absoluteIndirectAdressing(ushort addr) {return getWordFromMemory(addr);}
         // addressing, which uses the X index register to select one of a range of vectors in zeropage and takes the address from that pointer. Extremely rarely used!
-        private ushort indexedIndirectAdressing() {return getWordFromZeropage(X);}
+        private ushort indexedIndirectAdressing(byte addr) {return getWordFromZeropage((byte)(addr+X));}
         // addressing, which adds the Y index register to the contents of a pointer to obtain the address. Very flexible instruction found in anything but the most trivial machine language routines!
-        private ushort indirectIndexedAdressing(ushort addr){return getWordFromMemory((ushort)(getWordFromMemory(addr) + Y));}
+        private ushort indirectIndexedAdressing(ushort addr, bool pageBoundry=false){
+            return getWordFromMemory(
+                (ushort)(getWordFromMemory(addr, pageBoundry:pageBoundry) + Y),
+                pageBoundry:pageBoundry
+            );
+        }
+        private byte indirectIndexedZeropageAdressing(byte addr){return (byte)(indirectIndexedAdressing(addr, pageBoundry:true));}
     }
 }
