@@ -7,6 +7,7 @@ using System.Threading;
 using NLog;
 
 using MOS;
+using Y1;
 
 namespace commodore
 {
@@ -29,7 +30,8 @@ namespace commodore
 
         private CPU6510 cpu;
         private byte[] memory;
-        private Thread systemClockThread;
+
+        private SystemClock y1;
         private int systemClockRate;
         private Mutex cpuMutex;
 
@@ -61,6 +63,8 @@ namespace commodore
             loadRomFromFile(characterRom, characterRomFileName);
             kernalRom = new byte[8192];
             loadRomFromFile(kernalRom, kernalRomFileName);
+
+            y1 = new SystemClock(cpu.getSystemClockMutex());
         }
 
         public void powerOn()
@@ -74,18 +78,15 @@ namespace commodore
             log.Debug("Updating memory banks ...");
             updateMemoryBanks();
 
-            log.Debug("Creating system clock thread ...");
-            ThreadStart systemClock = new ThreadStart(systemClockRunner);
-            systemClockThread = new Thread(systemClock);
-            systemClockThread.Start();
+            y1.start();
         }
+
         public void powerOff()
         {
             log.Debug("powering off system ...");
             powerSwitch = false;
 
-            log.Debug("joining system clock thread ...");
-            systemClockThread.Join();
+            y1.stop();
             log.Debug("system powered off!");
         }
 
@@ -149,23 +150,6 @@ namespace commodore
         {
             byte[] romFileContent = File.ReadAllBytes(romFileName);
             Array.Copy(romFileContent, rom, rom.Length);
-        }
-
-        private void systemClockRunner()
-        {
-            cpuMutex = cpu.getSystemClockMutex();
-            cpuMutex.WaitOne();
-
-            log.Debug("... system clock started");
-            while(powerSwitch){
-                Thread.Sleep(1000);  // ToDo: this is just a placeholder
-                log.Debug("SystemClock: Tick!");
-                cpuMutex.ReleaseMutex();
-                cpuMutex.WaitOne();
-            }
-
-            cpuMutex.ReleaseMutex();
-            log.Debug("... system clock ended");
         }
     }
 }
