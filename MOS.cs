@@ -110,8 +110,7 @@ namespace MOS
             exitExecutionLoop = false;
 
             this.memory = memory;
-            this.systemClockMutex = new Mutex(true, "CPU6510");
-            systemClockMutex.ReleaseMutex();
+            this.systemClockMutex = new Mutex(false, "CPU6510");
         }
 
         public void start()
