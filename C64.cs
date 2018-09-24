@@ -96,13 +96,18 @@ namespace commodore
         public void updateMemoryBanks()
         {
             if ( (memory[0x01] & (byte)Latch.LORAM) != 0 )
-                Array.Copy(basicRom, 0x00, memory, 0xa000, basicRom.Length);
+                loadToMemory(basicRom, 0xa000);
             if ( (memory[0x01] & (byte)Latch.HIRAM) != 0 )
-                Array.Copy(kernalRom, 0x00, memory, 0xe000, kernalRom.Length);
+                loadToMemory(kernalRom, 0xe000);
             if ( (memory[0x01] & (byte)Latch.CHAREN) != 0 )
                 log.Debug("ToDo: CHAREN is set, I/O should be mapped");
             else
-                Array.Copy(characterRom, 0x00, memory, 0xd000, characterRom.Length);
+                loadToMemory(characterRom, 0xd000);
+        }
+
+        public void loadToMemory(byte[] src, ushort offset)
+        {
+            Array.Copy(src, 0x00, memory, offset, src.length);
         }
 
         public void dumpMemory(ushort offset, byte[] memory)
