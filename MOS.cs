@@ -18,12 +18,7 @@ namespace MOS
 
     class CPU6510
     {
-        private static ushort PAGE_SIZE;
-
-        static CPU6510()
-        {
-            PAGE_SIZE = 256;
-        }
+        private static ushort PAGE_SIZE = 256;
 
         /*  Program Counter
 
