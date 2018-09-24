@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 using NLog;
 
@@ -11,11 +12,28 @@ namespace commodore
 {
     [Flags]
     public enum Latch { LORAM = 0x01, HIRAM = 0x02, CHAREN = 0x04, }
+
  
     class C64
     {
+        // Y1 Crystal frequency NTSC
+        public static int Y1_NTSC = 14318180;
+        // Y1_NTSC/14
+        public static int CLOCK_NTSC = 1022727;
+
+        // Y1 Crystal frequency PAL
+        public static int Y1_PAL = 17734475;
+        // Y1_NTSC/18
+        public static int CLOCK_PAL = 985248;
+
+
         private CPU6510 cpu;
         private byte[] memory;
+        private Thread systemClockThread;
+        private int systemClockRate;
+
+        // flag to indicate online state. Used for instance in the system clock.
+        private bool powerSwitch;
 
         // ROM
         private byte[] basicRom;
@@ -25,9 +43,14 @@ namespace commodore
 
         private Logger log;
 
-        public C64(string basicRomFileName, string characterRomFileName, string kernalRomFileName)
+        public C64(string basicRomFileName, string characterRomFileName, string kernalRomFileName, bool isPal=true)
         {
             log = log = NLog.LogManager.GetCurrentClassLogger();
+
+            if (isPal)
+                systemClockRate = CLOCK_PAL;
+            else
+                systemClockRate = CLOCK_NTSC;
 
             cpu = new CPU6510(memory);
             memory = new byte[ushort.MaxValue+1];
@@ -40,11 +63,30 @@ namespace commodore
             loadRomFromFile(kernalRom, kernalRomFileName);
         }
 
-        public void initialize()
+        public void powerOn()
         {
+            log.Debug("Initializing system");
+            powerSwitch = true;
+
+            log.Debug("Creating system clock thread ...");
+            ThreadStart systemClock = new ThreadStart(systemClockRunner);
+            systemClockThread = new Thread(systemClock);
+            systemClockThread.Start();
+
+            log.Debug("Initializing memory ...");
             memory[0x00] = 0xff;
             memory[0x01] = 0x07;
+            log.Debug("Updating memory banks ...");
             updateMemoryBanks();
+        }
+        public void powerOff()
+        {
+            log.Debug("powering off system ...");
+            powerSwitch = false;
+
+            log.Debug("joining system clock thread ...");
+            systemClockThread.Join();
+            log.Debug("system powered off!");
         }
 
         /* Depending on the latch byte in memory this function will load the different ROMs into memory
@@ -107,6 +149,16 @@ namespace commodore
         {
             byte[] romFileContent = File.ReadAllBytes(romFileName);
             Array.Copy(romFileContent, rom, rom.Length);
+        }
+
+        private void systemClockRunner()
+        {
+            log.Debug("... system clock running");
+            while(powerSwitch){
+                Thread.Sleep(1000);  // ToDo: this is just a placeholder
+                log.Debug("SystemClock: Tick!");
+            }
+            log.Debug("... system clock ended");
         }
     }
 }

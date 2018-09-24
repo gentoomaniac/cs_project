@@ -1,5 +1,6 @@
 ﻿using NLog;
 using System;
+using System.Threading;
 
 using commodore;
 using MOS;
@@ -17,8 +18,10 @@ namespace project
             Logger log = NLog.LogManager.GetCurrentClassLogger();
             //log.Debug(ushort.MaxValue);
             //c64.dumpRoms();
-            c64.initialize();
-            c64.dumpMemory();
+            c64.powerOn();
+            // c64.dumpMemory();
+            Thread.Sleep(5000);
+            c64.powerOff();
 
             /*
             ushort value = 0;
