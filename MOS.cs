@@ -168,21 +168,21 @@ namespace MOS
         /* Logical and arithmetic commands */
         // A | addr
         public void ORA(ushort address) {
-            A |= memory[address];
+            A |= getByteFromMemory(address);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
         }
         // A & addr
         public void AND(ushort address) {
-            A &= memory[address];
+            A &= getByteFromMemory(address);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
         }
         // A ^ addr
         public void EOR(ushort address) {
-            A ^= memory[address];
+            A ^= getByteFromMemory(address);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
@@ -190,7 +190,7 @@ namespace MOS
         // A + addr
         public void ADC(ushort address) {
             setProcessorStatusBit(ProcessorStatus.V, isSet:( ((A + memory[address]) & (byte)ProcessorStatus.N) != (A & (byte)ProcessorStatus.N) ));
-            A += memory[address];
+            A += getByteFromMemory(address);
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
         }
