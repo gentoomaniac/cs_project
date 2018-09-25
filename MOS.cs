@@ -97,7 +97,7 @@ namespace MOS
         public byte Y;
 
         private byte[] memory;
-        private Mutex systemClockMutex;
+        private AutoResetEvent cycleUnlockEvent;
 
         private Thread executionLoopThread;
         private bool exitExecutionLoop;
@@ -110,7 +110,7 @@ namespace MOS
             exitExecutionLoop = false;
 
             this.memory = memory;
-            this.systemClockMutex = new Mutex(false, "CPU6510");
+            this.cycleUnlockEvent = new AutoResetEvent(false);
         }
 
         public void start()
@@ -130,9 +130,9 @@ namespace MOS
             log.Debug("execution loop stopped.");
         }
 
-        public Mutex getSystemClockMutex()
+        public AutoResetEvent getCycleUnlockEventObject()
         {
-            return systemClockMutex;
+            return cycleUnlockEvent;
         }
 
         /* Maps opcodes to the actual commands and takes care of the different adressing modes
@@ -161,46 +161,42 @@ namespace MOS
                     break;
 
                 default:
-                    throw new IllegalOpcodeException(string.Format("{0} is an illigal Opcode", opcode.ToString("x2")));
+                    throw new IllegalOpcodeException(string.Format("0x{0} is an illigal Opcode", opcode.ToString("x2")));
             }
         }
 
         /* Logical and arithmetic commands */
         // A | addr
         public void ORA(ushort address) {
-            systemClockMutex.WaitOne();
+            cycleUnlockEvent.WaitOne();
             A |= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            systemClockMutex.ReleaseMutex();
         }
         // A & addr
         public void AND(ushort address) {
-            systemClockMutex.WaitOne();
+            cycleUnlockEvent.WaitOne();
             A &= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            systemClockMutex.ReleaseMutex();
         }
         // A ^ addr
         public void EOR(ushort address) {
-            systemClockMutex.WaitOne();
+            cycleUnlockEvent.WaitOne();
             A ^= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            systemClockMutex.ReleaseMutex();
         }
         // A + addr
         public void ADC(ushort address) {
-            systemClockMutex.WaitOne();
+            cycleUnlockEvent.WaitOne();
             setProcessorStatusBit(ProcessorStatus.V, isSet:( ((A + memory[address]) & (byte)ProcessorStatus.N) != (A & (byte)ProcessorStatus.N) ));
             A += getByteFromMemory(address, lockToCycle:false);
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            systemClockMutex.ReleaseMutex();
         }
 
 
@@ -217,10 +213,8 @@ namespace MOS
         {
             byte b;
             if (lockToCycle)
-                systemClockMutex.WaitOne();
+                cycleUnlockEvent.WaitOne();
             b = memory[addr];
-            if (lockToCycle)
-                systemClockMutex.ReleaseMutex();
             return b;
         }
 

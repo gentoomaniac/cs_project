@@ -8,20 +8,19 @@ namespace Y1
     {
         private Thread systemClockThread;
         private int systemClockRate;
-        private Mutex cpuMutex;
+        private AutoResetEvent cpuCycleUnlockEvent;
 
         private bool doRun;
 
         private Logger log;
 
-        public SystemClock(Mutex cpuMutex)
+        public SystemClock(AutoResetEvent cpuCycleUnlockEvent)
         {
             log = log = NLog.LogManager.GetCurrentClassLogger();
             doRun = true;
 
-            this.cpuMutex = cpuMutex;
+            this.cpuCycleUnlockEvent = cpuCycleUnlockEvent;
             log.Debug("initially locking cpu ...");
-            this.cpuMutex.WaitOne();
         }
 
         public void start()
@@ -48,7 +47,6 @@ namespace Y1
 
         public void cleanup()
         {
-            cpuMutex.ReleaseMutex();
             log.Debug("system clock stopped.");
         }
 
@@ -58,10 +56,8 @@ namespace Y1
             while(doRun){
                 Thread.Sleep(100);  // ToDo: this is just a placeholder
                 log.Debug("SystemClock tick:");
-                cpuMutex.ReleaseMutex();
-                log.Debug("- cpu mutex released");
-                cpuMutex.WaitOne();
-                log.Debug("- cpu mutex acquired");
+                cpuCycleUnlockEvent.Set();
+                log.Debug("- cpu cycleUnlockEvent sent");
             }
         }
     }

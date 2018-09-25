@@ -17,7 +17,7 @@ namespace ClockTests
             byte[] blankMemory = new byte[65536];
             CPU6510 cpu = new CPU6510(blankMemory);
             Random rnd = new Random();
-            SystemClock y1 = new SystemClock(cpu.getSystemClockMutex());
+            SystemClock y1 = new SystemClock(cpu.getCycleUnlockEventObject());
             y1.start();
 
             for (int i = 0; i < 100; i++)
@@ -50,7 +50,7 @@ namespace ClockTests
             byte[] blankMemory = new byte[65536];
             CPU6510 cpu = new CPU6510(blankMemory);
             Random rnd = new Random();
-            SystemClock y1 = new SystemClock(cpu.getSystemClockMutex());
+            SystemClock y1 = new SystemClock(cpu.getCycleUnlockEventObject());
             y1.start();
 
             for (int i = 0; i < 100; i++)
@@ -84,7 +84,7 @@ namespace ClockTests
             byte[] blankMemory = new byte[65536];
             CPU6510 cpu = new CPU6510(blankMemory);
             Random rnd = new Random();
-            SystemClock y1 = new SystemClock(cpu.getSystemClockMutex());
+            SystemClock y1 = new SystemClock(cpu.getCycleUnlockEventObject());
             y1.start();
 
             for (int i = 0; i < 100; i++)

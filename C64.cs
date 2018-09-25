@@ -54,8 +54,8 @@ namespace commodore
             else
                 systemClockRate = CLOCK_NTSC;
 
-            cpu = new CPU6510(memory);
             memory = new byte[ushort.MaxValue+1];
+            cpu = new CPU6510(memory);
 
             basicRom = new byte[8192];
             loadRomFromFile(basicRom, basicRomFileName);
@@ -64,7 +64,7 @@ namespace commodore
             kernalRom = new byte[8192];
             loadRomFromFile(kernalRom, kernalRomFileName);
 
-            y1 = new SystemClock(cpu.getSystemClockMutex());
+            y1 = new SystemClock(cpu.getCycleUnlockEventObject());
         }
 
         public void powerOn()
@@ -126,9 +126,10 @@ namespace commodore
                 rowAsHexidecimal = Array.ConvertAll<byte, string>(memoryRow, holdByte => holdByte.ToString("x2"));
                 rowAsCharacter = Array.ConvertAll<byte, char>(memoryRow, holdByte => (char)holdByte);
                 log.Debug(
-                    string.Format("{0}h: {1}\t{2}",i.ToString("x4"),
-                                    string.Join(" ", rowAsHexidecimal),
-                                    Regex.Replace(string.Join("", rowAsCharacter), "\\s", ".")));
+                    string.Format("{0}h: {1}\t{2}",
+                        i.ToString("x4"),
+                        string.Join(" ", rowAsHexidecimal),
+                        Regex.Replace(string.Join("", rowAsCharacter), "\\s", ".")));
             }
         }
 
