@@ -38,11 +38,6 @@ namespace Y1
             systemClockThread.Start();
         }
 
-        public void suspend()
-        {
-            systemClockThread.Suspend();
-        }
-
         public void halt(bool blocking=true)
         {
             doRun = false;
