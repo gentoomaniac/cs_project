@@ -168,36 +168,44 @@ namespace MOS
         /* Logical and arithmetic commands */
         // A | addr
         public void ORA(ushort address) {
-            A |= getByteFromMemory(address);
+            systemClockMutex.WaitOne();
+            A |= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            systemClockMutex.ReleaseMutex();
         }
         // A & addr
         public void AND(ushort address) {
-            A &= getByteFromMemory(address);
+            systemClockMutex.WaitOne();
+            A &= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            systemClockMutex.ReleaseMutex();
         }
         // A ^ addr
         public void EOR(ushort address) {
-            A ^= getByteFromMemory(address);
+            systemClockMutex.WaitOne();
+            A ^= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            systemClockMutex.ReleaseMutex();
         }
         // A + addr
         public void ADC(ushort address) {
+            systemClockMutex.WaitOne();
             setProcessorStatusBit(ProcessorStatus.V, isSet:( ((A + memory[address]) & (byte)ProcessorStatus.N) != (A & (byte)ProcessorStatus.N) ));
-            A += getByteFromMemory(address);
+            A += getByteFromMemory(address, lockToCycle:false);
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            systemClockMutex.ReleaseMutex();
         }
 
 
         /* HELPERS */
-        private void setProcessorStatusBit(ProcessorStatus s, bool isSet = true)
+        private void setProcessorStatusBit(ProcessorStatus s, bool isSet=true)
         {
             if (isSet)
                 P = (byte)(P | (byte)s);
@@ -205,12 +213,14 @@ namespace MOS
                 P = (byte)(P & (byte)(0xff ^ (byte)s));
         }
 
-        private byte getByteFromMemory(ushort addr)
+        private byte getByteFromMemory(ushort addr, bool lockToCycle=true)
         {
             byte b;
-            systemClockMutex.WaitOne();
+            if (lockToCycle)
+                systemClockMutex.WaitOne();
             b = memory[addr];
-            systemClockMutex.ReleaseMutex();
+            if (lockToCycle)
+                systemClockMutex.ReleaseMutex();
             return b;
         }
 
