@@ -130,6 +130,8 @@ namespace MOS
             log.Debug("execution loop stopped.");
         }
 
+        public void join() {executionLoopThread.Join();}
+
         public AutoResetEvent getCycleUnlockEventObject()
         {
             return cycleUnlockEvent;
@@ -159,9 +161,20 @@ namespace MOS
                 case 0x45:
                     EOR(zeropageAdressing(getNextCodeByte()));
                     break;
+                case 0x85:
+                    STA(zeropageAdressing(getNextCodeByte()));
+                    break;
+                case 0x8d:
+                    STA(absoluteAdressing(getNextCodeWord()));
+                    break;
+                case 0xea:
+                    NOP();
+                    break;
 
                 default:
-                    throw new IllegalOpcodeException(string.Format("0x{0} is an illigal Opcode", opcode.ToString("x2")));
+                    log.Debug(string.Format("0x{0} is an unimplemented Opcode", opcode.ToString("x2")));
+                    //throw new IllegalOpcodeException(string.Format("0x{0} is an illigal Opcode", opcode.ToString("x2")));
+                    break;
             }
         }
 
@@ -173,6 +186,7 @@ namespace MOS
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleUnlockEvent.Set();
         }
         // A & addr
         public void AND(ushort address) {
@@ -181,6 +195,7 @@ namespace MOS
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleUnlockEvent.Set();
         }
         // A ^ addr
         public void EOR(ushort address) {
@@ -189,6 +204,7 @@ namespace MOS
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleUnlockEvent.Set();
         }
         // A + addr
         public void ADC(ushort address) {
@@ -197,6 +213,23 @@ namespace MOS
             A += getByteFromMemory(address, lockToCycle:false);
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleUnlockEvent.Set();
+        }
+
+        public void STA(ushort address)
+        {
+            cycleUnlockEvent.WaitOne();
+            log.Debug("--- STA started ---");
+            A = getByteFromMemory(address, lockToCycle:false);
+            log.Debug(string.Format("Register A set to {0}", A.ToString("x2")));
+            log.Debug("--- STA finished ---");
+            cycleUnlockEvent.Set();
+        }
+
+        public void NOP()
+        {
+            cycleUnlockEvent.WaitOne();
+            cycleUnlockEvent.Set();
         }
 
 
@@ -212,9 +245,14 @@ namespace MOS
         private byte getByteFromMemory(ushort addr, bool lockToCycle=true)
         {
             byte b;
-            if (lockToCycle)
+            if (lockToCycle){
+                log.Debug("waiting for cycle");
                 cycleUnlockEvent.WaitOne();
+            }
             b = memory[addr];
+            if (lockToCycle)
+                cycleUnlockEvent.Set();
+            log.Debug(string.Format("next byte loaded: {0}", b.ToString("x2")));
             return b;
         }
 
@@ -235,7 +273,7 @@ namespace MOS
         private ushort getWordFromZeropage(byte addr) {return getWordFromMemory(addr, pageBoundry:true);}
 
         /* get the next code byte/word from memory and increment PC */
-        private byte getNextCodeByte() {return getByteFromMemory(PC++);}
+        private byte getNextCodeByte() {log.Debug("loading next code byte");return getByteFromMemory(PC++);}
         private ushort getNextCodeWord()
         {
             ushort word = getWordFromMemory(PC, (ushort)(PC+1));
@@ -281,6 +319,7 @@ namespace MOS
         {
             while(!exitExecutionLoop)
             {
+                log.Debug("loading next opcode");
                 opcodeMapper(getNextCodeByte());
             }
         }

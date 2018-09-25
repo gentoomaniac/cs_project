@@ -78,6 +78,9 @@ namespace commodore
             log.Debug("Updating memory banks ...");
             updateMemoryBanks();
 
+            // TESTING: set PC to the location of the kernal
+            cpu.PC = 0xe000;
+
             cpu.start();
             y1.start();
         }
@@ -92,6 +95,8 @@ namespace commodore
             y1.cleanup();
             log.Debug("system powered off!");
         }
+
+        public void join(){cpu.join();}
 
         /* Depending on the latch byte in memory this function will load the different ROMs into memory
          https://www.c64-wiki.com/wiki/Bank_Switching#CPU_Control_Lines
