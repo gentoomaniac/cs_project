@@ -21,7 +21,7 @@ namespace Y1
 
             this.cpuMutex = cpuMutex;
             log.Debug("initially locking cpu ...");
-            cpuMutex.WaitOne();
+            this.cpuMutex.WaitOne();
         }
 
         public void start()
@@ -32,12 +32,28 @@ namespace Y1
             systemClockThread.Start();
         }
 
-        public void stop(bool blocking=true)
+        public void resume()
         {
-            log.Debug("stopping system clock ...");
+            doRun = true;
+            systemClockThread.Start();
+        }
+
+        public void suspend()
+        {
+            systemClockThread.Suspend();
+        }
+
+        public void halt(bool blocking=true)
+        {
             doRun = false;
             if (blocking)
                 systemClockThread.Join();
+            log.Debug("system clock halted.");
+        }
+
+        public void cleanup()
+        {
+            cpuMutex.ReleaseMutex();
             log.Debug("system clock stopped.");
         }
 
@@ -52,9 +68,6 @@ namespace Y1
                 cpuMutex.WaitOne();
                 log.Debug("- cpu mutex acquired");
             }
-
-            cpuMutex.ReleaseMutex();
-            log.Debug("... system clock ended");
         }
     }
 }

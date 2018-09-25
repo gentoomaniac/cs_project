@@ -87,8 +87,9 @@ namespace commodore
             log.Debug("powering off system ...");
             powerSwitch = false;
 
+            y1.halt();
             cpu.stop();
-            y1.stop();
+            y1.cleanup();
             log.Debug("system powered off!");
         }
 
