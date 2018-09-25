@@ -6,6 +6,7 @@ using System.Threading;
 
 using NLog;
 
+using CycleLock;
 using MOS;
 using Y1;
 
@@ -55,7 +56,8 @@ namespace commodore
                 systemClockRate = CLOCK_NTSC;
 
             memory = new byte[ushort.MaxValue+1];
-            cpu = new CPU6510(memory);
+            Lock cpuLock = new Lock();
+            cpu = new CPU6510(memory, cpuLock);
 
             basicRom = new byte[8192];
             loadRomFromFile(basicRom, basicRomFileName);
@@ -64,7 +66,7 @@ namespace commodore
             kernalRom = new byte[8192];
             loadRomFromFile(kernalRom, kernalRomFileName);
 
-            y1 = new SystemClock(cpu.getCycleUnlockEventObject());
+            y1 = new SystemClock(cpuLock);
         }
 
         public void powerOn()

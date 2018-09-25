@@ -2,6 +2,7 @@ using System;
 
 using NUnit.Framework;
 
+using CycleLock;
 using MOS;
 
 namespace CoreTests
@@ -13,7 +14,8 @@ namespace CoreTests
         {
             byte value = 0;
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
 
             value = 0;
             cpu.PCL = value;
@@ -39,7 +41,8 @@ namespace CoreTests
         {
             byte value = 0;
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
 
             value = 0;
             cpu.PCH = value;
@@ -65,7 +68,8 @@ namespace CoreTests
         {
             ushort value = 0;
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
 
             value = 0;
             cpu.PC = value;
@@ -99,7 +103,8 @@ namespace CoreTests
             byte oldA;
             ushort addr = 0x002a;
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
             for (int i = 0; i < 100; i++)
@@ -130,7 +135,8 @@ namespace CoreTests
             byte oldA;
             ushort addr = 0x002a;
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
             for (int i = 0; i < 100; i++)
@@ -162,7 +168,8 @@ namespace CoreTests
             byte oldA;
             ushort addr = 0x002a;
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
             for (int i = 0; i < 100; i++)
@@ -197,7 +204,8 @@ namespace CoreTests
         {
             ushort addr = 0x0100;
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x01;
             byte oldA;
@@ -222,7 +230,8 @@ namespace CoreTests
         {
             ushort addr = 0x0100;
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x05;
             byte oldA;
@@ -246,7 +255,8 @@ namespace CoreTests
         {
             ushort addr = 0x0100;
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x11 ;
             byte oldA;
@@ -270,7 +280,8 @@ namespace CoreTests
         {
             ushort addr = 0x0100;
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            Lock cpuLock = new Lock();
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x15;
             byte oldA;

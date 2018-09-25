@@ -2,6 +2,7 @@ using System;
 
 using NUnit.Framework;
 
+using CycleLock;
 using MOS;
 using Y1;
 
@@ -14,10 +15,11 @@ namespace ClockTests
         {
             byte oldA;
             ushort addr = 0x002a;
+            Lock cpuLock = new Lock();
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
-            SystemClock y1 = new SystemClock(cpu.getCycleUnlockEventObject());
+            SystemClock y1 = new SystemClock(cpuLock);
             y1.start();
 
             for (int i = 0; i < 100; i++)
@@ -47,10 +49,11 @@ namespace ClockTests
         {
             byte oldA;
             ushort addr = 0x002a;
+            Lock cpuLock = new Lock();
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
-            SystemClock y1 = new SystemClock(cpu.getCycleUnlockEventObject());
+            SystemClock y1 = new SystemClock(cpuLock);
             y1.start();
 
             for (int i = 0; i < 100; i++)
@@ -81,10 +84,11 @@ namespace ClockTests
         {
             byte oldA;
             ushort addr = 0x002a;
+            Lock cpuLock = new Lock();
             byte[] blankMemory = new byte[65536];
-            CPU6510 cpu = new CPU6510(blankMemory);
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
-            SystemClock y1 = new SystemClock(cpu.getCycleUnlockEventObject());
+            SystemClock y1 = new SystemClock(cpuLock);
             y1.start();
 
             for (int i = 0; i < 100; i++)
@@ -118,8 +122,9 @@ namespace ClockTests
         public void testORAZeropageIndexedIndirect()
         {
             ushort addr = 0x0100;
+            Lock cpuLock = new Lock();
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x01;
             byte oldA;
@@ -143,8 +148,9 @@ namespace ClockTests
         public void testORAZeropage()
         {
             ushort addr = 0x0100;
+            Lock cpuLock = new Lock();
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x05;
             byte oldA;
@@ -167,8 +173,9 @@ namespace ClockTests
         public void testORAZeropageindirectIndexed()
         {
             ushort addr = 0x0100;
+            Lock cpuLock = new Lock();
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x11 ;
             byte oldA;
@@ -191,8 +198,9 @@ namespace ClockTests
         public void testORAZeropageIndexed()
         {
             ushort addr = 0x0100;
+            Lock cpuLock = new Lock();
             byte[] memory = new byte[65536];
-            CPU6510 cpu = new CPU6510(memory);
+            CPU6510 cpu = new CPU6510(memory, cpuLock);
             Random rnd = new Random();
             byte opcode = 0x15;
             byte oldA;

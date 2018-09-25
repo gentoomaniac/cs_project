@@ -2,6 +2,7 @@ using System.Threading;
 
 using NLog;
 
+using CycleLock;
 using Exceptions;
 
 namespace MOS
@@ -97,20 +98,20 @@ namespace MOS
         public byte Y;
 
         private byte[] memory;
-        private AutoResetEvent cycleUnlockEvent;
+        private Lock cycleLock;
 
         private Thread executionLoopThread;
         private bool exitExecutionLoop;
 
         private Logger log;
 
-        public CPU6510(byte[] memory)
+        public CPU6510(byte[] memory, Lock cyckleLock)
         {
             log = NLog.LogManager.GetCurrentClassLogger();
             exitExecutionLoop = false;
 
             this.memory = memory;
-            this.cycleUnlockEvent = new AutoResetEvent(false);
+            this.cycleLock = cyckleLock;
         }
 
         public void start()
@@ -131,11 +132,6 @@ namespace MOS
         }
 
         public void join() {executionLoopThread.Join();}
-
-        public AutoResetEvent getCycleUnlockEventObject()
-        {
-            return cycleUnlockEvent;
-        }
 
         /* Maps opcodes to the actual commands and takes care of the different adressing modes
          */
@@ -176,60 +172,59 @@ namespace MOS
                     //throw new IllegalOpcodeException(string.Format("0x{0} is an illigal Opcode", opcode.ToString("x2")));
                     break;
             }
+            log.Debug(string.Format("0x{0} took {1} cycles", opcode.ToString("x2"), cycleLock.getCycleCount()));
+            cycleLock.resetCycleCount();
         }
 
         /* Logical and arithmetic commands */
         // A | addr
         public void ORA(ushort address) {
-            cycleUnlockEvent.WaitOne();
+            cycleLock.enterCycle();
             A |= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            cycleUnlockEvent.Set();
+            cycleLock.exitCycle();
         }
         // A & addr
         public void AND(ushort address) {
-            cycleUnlockEvent.WaitOne();
+            cycleLock.enterCycle();
             A &= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            cycleUnlockEvent.Set();
+            cycleLock.exitCycle();
         }
         // A ^ addr
         public void EOR(ushort address) {
-            cycleUnlockEvent.WaitOne();
+            cycleLock.enterCycle();
             A ^= getByteFromMemory(address, lockToCycle:false);
 
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            cycleUnlockEvent.Set();
+            cycleLock.exitCycle();
         }
         // A + addr
         public void ADC(ushort address) {
-            cycleUnlockEvent.WaitOne();
+            cycleLock.enterCycle();
             setProcessorStatusBit(ProcessorStatus.V, isSet:( ((A + memory[address]) & (byte)ProcessorStatus.N) != (A & (byte)ProcessorStatus.N) ));
             A += getByteFromMemory(address, lockToCycle:false);
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
-            cycleUnlockEvent.Set();
+            cycleLock.exitCycle();
         }
 
         public void STA(ushort address)
         {
-            cycleUnlockEvent.WaitOne();
-            log.Debug("--- STA started ---");
+            cycleLock.enterCycle();
             A = getByteFromMemory(address, lockToCycle:false);
-            log.Debug(string.Format("Register A set to {0}", A.ToString("x2")));
-            log.Debug("--- STA finished ---");
-            cycleUnlockEvent.Set();
+            cycleLock.exitCycle();
         }
 
         public void NOP()
         {
-            cycleUnlockEvent.WaitOne();
-            cycleUnlockEvent.Set();
+            cycleLock.enterCycle();
+            cycleLock.exitCycle();
         }
 
 
@@ -245,13 +240,12 @@ namespace MOS
         private byte getByteFromMemory(ushort addr, bool lockToCycle=true)
         {
             byte b;
-            if (lockToCycle){
-                log.Debug("waiting for cycle");
-                cycleUnlockEvent.WaitOne();
-            }
+            if (lockToCycle)
+            cycleLock.enterCycle();
+
             b = memory[addr];
             if (lockToCycle)
-                cycleUnlockEvent.Set();
+            cycleLock.exitCycle();
             log.Debug(string.Format("next byte loaded: {0}", b.ToString("x2")));
             return b;
         }
@@ -317,7 +311,8 @@ namespace MOS
 
         private void executionLoop()
         {
-            while(!exitExecutionLoop)
+            //while(!exitExecutionLoop)
+            for (int i = 0; i<10; i++)
             {
                 log.Debug("loading next opcode");
                 opcodeMapper(getNextCodeByte());

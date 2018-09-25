@@ -2,24 +2,26 @@ using System.Threading;
 
 using NLog;
 
+using CycleLock;
+
 namespace Y1
 {
     class SystemClock
     {
         private Thread systemClockThread;
         private int systemClockRate;
-        private AutoResetEvent cpuCycleUnlockEvent;
+        private Lock cpuLock;
 
         private bool doRun;
 
         private Logger log;
 
-        public SystemClock(AutoResetEvent cpuCycleUnlockEvent)
+        public SystemClock(Lock cpuLock)
         {
             log = log = NLog.LogManager.GetCurrentClassLogger();
             doRun = true;
 
-            this.cpuCycleUnlockEvent = cpuCycleUnlockEvent;
+            this.cpuLock = cpuLock;
             log.Debug("initially locking cpu ...");
         }
 
@@ -57,17 +59,9 @@ namespace Y1
                 Thread.Sleep(100);  // ToDo: this is just a placeholder
                 log.Debug("SystemClock tick:");
                 log.Debug("... cpu tick");
-                releaseAndWait(cpuCycleUnlockEvent);
+                cpuLock.startCycle();
                 log.Debug("... cpu tack");
             }
-        }
-
-        private void releaseAndWait(AutoResetEvent e)
-        {
-            e.Set();        // release component
-            //e.Reset();      // reset event status
-            e.WaitOne();    // block on event until component finishes cycle
-            //e.Reset();      // reset event status
         }
     }
 }
