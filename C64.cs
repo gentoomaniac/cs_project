@@ -136,7 +136,7 @@ namespace commodore
                     string.Format("{0}h: {1}\t{2}",
                         i.ToString("x4"),
                         string.Join(" ", rowAsHexidecimal),
-                        Regex.Replace(string.Join("", rowAsCharacter), "\\s", ".")));
+                        Regex.Replace(string.Join("", rowAsCharacter), "[^\x21-\x7e]", ".")));
             }
         }
 

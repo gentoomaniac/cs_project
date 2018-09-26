@@ -19,8 +19,8 @@ namespace project
             //log.Debug(ushort.MaxValue);
             //c64.dumpRoms();
             c64.powerOn();
-            // c64.dumpMemory();
-            //Thread.Sleep(6000);
+            c64.dumpMemory();
+            Thread.Sleep(6000);
             c64.join();
             c64.powerOff();
 

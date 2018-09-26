@@ -229,6 +229,7 @@ namespace MOS
 
 
         /* HELPERS */
+        //ToDo: check ENum and get rid of all the casting
         private void setProcessorStatusBit(ProcessorStatus s, bool isSet=true)
         {
             if (isSet)
@@ -241,11 +242,11 @@ namespace MOS
         {
             byte b;
             if (lockToCycle)
-            cycleLock.enterCycle();
+                cycleLock.enterCycle();
 
             b = memory[addr];
             if (lockToCycle)
-            cycleLock.exitCycle();
+                cycleLock.exitCycle();
             log.Debug(string.Format("next byte loaded: {0}", b.ToString("x2")));
             return b;
         }
@@ -267,7 +268,7 @@ namespace MOS
         private ushort getWordFromZeropage(byte addr) {return getWordFromMemory(addr, pageBoundry:true);}
 
         /* get the next code byte/word from memory and increment PC */
-        private byte getNextCodeByte() {log.Debug("loading next code byte");return getByteFromMemory(PC++);}
+        private byte getNextCodeByte() {return getByteFromMemory(PC++);}
         private ushort getNextCodeWord()
         {
             ushort word = getWordFromMemory(PC, (ushort)(PC+1));
@@ -314,7 +315,6 @@ namespace MOS
             //while(!exitExecutionLoop)
             for (int i = 0; i<10; i++)
             {
-                log.Debug("loading next opcode");
                 opcodeMapper(getNextCodeByte());
             }
         }

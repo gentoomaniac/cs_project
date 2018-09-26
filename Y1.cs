@@ -57,10 +57,7 @@ namespace Y1
             log.Debug("... system clock started");
             while(doRun){
                 Thread.Sleep(100);  // ToDo: this is just a placeholder
-                log.Debug("SystemClock tick:");
-                log.Debug("... cpu tick");
                 cpuLock.startCycle();
-                log.Debug("... cpu tack");
             }
         }
     }
