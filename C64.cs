@@ -80,9 +80,6 @@ namespace commodore
             log.Debug("Updating memory banks ...");
             updateMemoryBanks();
 
-            // TESTING: set PC to the location of the kernal
-            cpu.PC = 0xe000;
-
             cpu.start();
             y1.start();
         }
