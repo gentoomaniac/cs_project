@@ -19,6 +19,7 @@ namespace MOS
     }
 
 
+    // https://en.wikipedia.org/wiki/Endianness#Little-endian
     class CPU6510
     {
         private static ushort PAGE_SIZE = 256;
@@ -229,7 +230,7 @@ namespace MOS
 
 
         /* HELPERS */
-        //ToDo: check ENum and get rid of all the casting
+        //ToDo: check Enum and get rid of all the casting
         private void setProcessorStatusBit(ProcessorStatus s, bool isSet=true)
         {
             if (isSet)
@@ -253,8 +254,8 @@ namespace MOS
 
         private ushort getWordFromMemory(ushort lo, ushort hi)
         {
-            ushort word = (ushort)(((ushort)getByteFromMemory(lo)) << 8);
-            return (ushort)(word | (ushort)getByteFromMemory(hi));
+            ushort word = (ushort)(((ushort)getByteFromMemory(hi)) << 8);
+            return (ushort)(word | (ushort)getByteFromMemory(lo));
         }
         private ushort getWordFromMemory(ushort addr, bool pageBoundry=false)
         {
