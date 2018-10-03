@@ -38,12 +38,12 @@ namespace MOS
         public ushort PC;
         public byte PCH
         {
-            get { return (byte)(PC>>8);}
+            get { return (byte)(PC>>8); }
             set { PC = (ushort)((value<<8) | PCL); }
         }
         public byte PCL
         {
-            get { return (byte)(PC&0x00ff);}
+            get { return (byte)(PC&0x00ff); }
             set { PC = (ushort)((PC&0x00) | value); }
         }
 
@@ -164,6 +164,9 @@ namespace MOS
                 case 0x8d:
                     STA(absoluteAdressing(getNextCodeWord()));
                     break;
+                case 0xa2:
+                    LDX(PC);
+                    break;
                 case 0xea:
                     NOP();
                     break;
@@ -228,6 +231,15 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void LDX(ushort address)
+        {
+            cycleLock.enterCycle();
+            X = getByteFromMemory(address, lockToCycle:false);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( X == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (X & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+
 
         /* HELPERS */
         //ToDo: check Enum and get rid of all the casting
@@ -285,10 +297,6 @@ namespace MOS
         // addressing, supported by bit-shifting instructions, turns the "action" of the operation towards the accumulator.
         //ToDo:
         private ushort accumulatorAdressing(){return 0;}
-        // addressing, which refers to the byte immediately following the opcode for the instruction.
-        // ToDo: this is prob incorrect
-        private ushort immidiateAdressing(ushort addr) {return (ushort)(addr + 1);}
-        // addressing, which refers to a given 16-bit address
         private ushort absoluteAdressing(ushort addr) {return addr;}
         // absolute addressing, indexed by either the X and Y index registers: These adds the index register to a base address, forming the final "destination" for the operation.
         private ushort indexedAdressing(ushort addr, byte offset) {return (ushort)(addr + offset);}
@@ -313,7 +321,13 @@ namespace MOS
 
         private void executionLoop()
         {
-            //while(!exitExecutionLoop)
+            // https://www.pagetable.com/?p=410
+            // load reset vector
+            PC = getWordFromMemory(0xfffc);
+            log.Debug(string.Format("loading reset vector took {0} cycles", cycleLock.getCycleCount()));
+            cycleLock.resetCycleCount();
+
+            // while(!exitExecutionLoop)
             for (int i = 0; i<10; i++)
             {
                 opcodeMapper(getNextCodeByte());
