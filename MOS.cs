@@ -325,8 +325,6 @@ namespace MOS
         {
             cycleLock.enterCycle();
             S = X;
-            setProcessorStatusBit(ProcessorStatus.Z, isSet:( S == 0 ));
-            setProcessorStatusBit(ProcessorStatus.N, isSet:( (S & (byte)ProcessorStatus.N) != 0 ));
             cycleLock.exitCycle();
         }
 

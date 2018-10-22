@@ -365,10 +365,6 @@ namespace TestInstructions
                 cpu.TXS();
 
                 Assert.AreEqual(cpu.S, cpu.X);
-                // zero bit set?
-                Assert.True((cpu.S == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
-                // negative bit set?
-                Assert.True((cpu.S >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
     }
