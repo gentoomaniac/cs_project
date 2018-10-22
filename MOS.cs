@@ -281,9 +281,57 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void TAX()
+        {
+            cycleLock.enterCycle();
+            X = A;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( X == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (X & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+        public void TXA()
+        {
+            cycleLock.enterCycle();
+            A = X;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+        public void TAY()
+        {
+            cycleLock.enterCycle();
+            Y = A;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( Y == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (Y & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+        public void TYA()
+        {
+            cycleLock.enterCycle();
+            A = Y;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+        public void TSX()
+        {
+            cycleLock.enterCycle();
+            X = S;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( X == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (X & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+        public void TXS()
+        {
+            cycleLock.enterCycle();
+            S = X;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( S == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (S & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+
         /* HELPERS */
         //ToDo: check Enum and get rid of all the casting
-
         private bool checkForOverflow(int vOld, int vNew)
         {
             if (vOld < 0x80 && vNew >= 0x80)

@@ -245,5 +245,131 @@ namespace TestInstructions
                 Assert.AreEqual(blankMemory[addr], cpu.Y);
             }
         }
+
+        [Test]
+        public void testTAX()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.A = (byte)rnd.Next(0,0xff);
+                cpu.TAX();
+
+                Assert.AreEqual(cpu.X, cpu.A);
+                // zero bit set?
+                Assert.True((cpu.X == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.X >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testTXA()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.X = (byte)rnd.Next(0,0xff);
+                cpu.TXA();
+
+                Assert.AreEqual(cpu.A, cpu.X);
+                // zero bit set?
+                Assert.True((cpu.A == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.A >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testTAY()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.A = (byte)rnd.Next(0,0xff);
+                cpu.TAY();
+
+                Assert.AreEqual(cpu.Y, cpu.A);
+                // zero bit set?
+                Assert.True((cpu.Y == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.Y >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testTYA()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.Y = (byte)rnd.Next(0,0xff);
+                cpu.TYA();
+
+                Assert.AreEqual(cpu.A, cpu.Y);
+                // zero bit set?
+                Assert.True((cpu.A == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.A >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testTSX()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.S = (byte)rnd.Next(0,0xff);
+                cpu.TSX();
+
+                Assert.AreEqual(cpu.X, cpu.S);
+                // zero bit set?
+                Assert.True((cpu.X == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.X >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testTXS()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.X = (byte)rnd.Next(0,0xff);
+                cpu.TXS();
+
+                Assert.AreEqual(cpu.S, cpu.X);
+                // zero bit set?
+                Assert.True((cpu.S == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.S >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
     }
 }
