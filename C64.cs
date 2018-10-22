@@ -56,7 +56,7 @@ namespace commodore
                 systemClockRate = CLOCK_NTSC;
 
             memory = new byte[ushort.MaxValue+1];
-            Lock cpuLock = new Lock();
+            Lock cpuLock = new AutoResetLock();
             cpu = new CPU6510(memory, cpuLock);
 
             basicRom = new byte[8192];
