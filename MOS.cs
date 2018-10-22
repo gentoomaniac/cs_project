@@ -180,7 +180,9 @@ namespace MOS
             cycleLock.resetCycleCount();
         }
 
-        /* Logical and arithmetic commands */
+        /* ************************************************ */
+        /* * Logical and arithmetic commands              * */
+        /* ************************************************ */
         // A | addr
         public void ORA(ushort address) {
             cycleLock.enterCycle();
@@ -222,6 +224,24 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void NOP()
+        {
+            cycleLock.enterCycle();
+            cycleLock.exitCycle();
+        }
+
+        /* ************************************************ */
+        /* * Move commands                                * */
+        /* ************************************************ */
+        public void LDA(ushort address)
+        {
+            cycleLock.enterCycle();
+            A = getByteFromMemory(address, lockToCycle:false);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+
         public void STA(ushort address)
         {
             cycleLock.enterCycle();
@@ -229,9 +249,10 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
-        public void NOP()
+        public void STX(ushort address)
         {
             cycleLock.enterCycle();
+            storeByteInMemory(address, X, lockToCycle:false);
             cycleLock.exitCycle();
         }
 
@@ -244,6 +265,21 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void LDY(ushort address)
+        {
+            cycleLock.enterCycle();
+            Y = getByteFromMemory(address, lockToCycle:false);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( Y == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (Y & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+
+        public void STY(ushort address)
+        {
+            cycleLock.enterCycle();
+            storeByteInMemory(address, Y, lockToCycle:false);
+            cycleLock.exitCycle();
+        }
 
         /* HELPERS */
         //ToDo: check Enum and get rid of all the casting

@@ -121,6 +121,29 @@ namespace TestInstructions
         }
 
         [Test]
+        public void testLDA()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.LDA(addr);
+
+                Assert.AreEqual(cpu.A, blankMemory[addr]);
+                // zero bit set?
+                Assert.True((cpu.A == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.A >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
         public void testSTA()
         {
             ushort addr = 0x00;
@@ -159,6 +182,67 @@ namespace TestInstructions
                 Assert.True((cpu.X == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
                 Assert.True((cpu.X >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testSTX()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                cpu.X = (byte)rnd.Next(0,255);
+                cpu.STX(addr);
+
+                Assert.AreEqual(blankMemory[addr], cpu.X);
+            }
+        }
+
+        [Test]
+        public void testLDY()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.LDY(addr);
+
+                Assert.AreEqual(cpu.Y, blankMemory[addr]);
+                // zero bit set?
+                Assert.True((cpu.Y == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.Y >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testSTY()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                cpu.Y = (byte)rnd.Next(0,255);
+                cpu.STY(addr);
+
+                Assert.AreEqual(blankMemory[addr], cpu.Y);
             }
         }
     }
