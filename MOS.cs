@@ -264,6 +264,11 @@ namespace MOS
                 P = (byte)(P & (byte)(0xff ^ (byte)s));
         }
 
+        public bool isProcessorStatusBitSet(ProcessorStatus s)
+        {
+            return (P & (byte)s) != 0;
+        }
+
         private byte getByteFromMemory(ushort addr, bool lockToCycle=true)
         {
             byte b;
