@@ -26,19 +26,11 @@ namespace TestInstructions
                 oldA = cpu.A;
                 cpu.ORA(addr);
                 Assert.AreEqual((oldA|blankMemory[addr]), cpu.A);
+                // zero bit set?
+                Assert.True((cpu.A == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.A >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
-
-            blankMemory[addr] = 0x00;
-            cpu.A = 0x00;
-            oldA = cpu.A;
-            cpu.ORA(addr);
-            Assert.AreEqual(0x02, cpu.P);
-
-            blankMemory[addr] = 0x81;
-            cpu.A = 0x02;
-            oldA = cpu.A;
-            cpu.ORA(addr);
-            Assert.AreEqual(0x80, cpu.P);
         }
 
         [Test]
@@ -58,20 +50,11 @@ namespace TestInstructions
                 oldA = cpu.A;
                 cpu.AND(addr);
                 Assert.AreEqual((oldA&blankMemory[addr]), cpu.A);
+                // zero bit set?
+                Assert.True((cpu.A == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.A >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
-
-            // Test Status Register
-            blankMemory[addr] = 0x05;
-            cpu.A = 0x62;
-            oldA = cpu.A;
-            cpu.AND(addr);
-            Assert.AreEqual(0x02, cpu.P);
-
-            blankMemory[addr] = 0x81;
-            cpu.A = 0x82;
-            oldA = cpu.A;
-            cpu.AND(addr);
-            Assert.AreEqual(0x80, cpu.P);
         }
 
         [Test]
