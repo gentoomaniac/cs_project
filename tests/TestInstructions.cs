@@ -133,5 +133,28 @@ namespace TestInstructions
                 Assert.AreEqual(blankMemory[addr], cpu.A);
             }
         }
+
+        [Test]
+        public void testLDX()
+        {
+            ushort addr = 0x0001;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.LDX(addr);
+
+                Assert.AreEqual(cpu.X, blankMemory[addr]);
+                // zero bit set?
+                Assert.True((cpu.X == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.True((cpu.X >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
     }
 }
