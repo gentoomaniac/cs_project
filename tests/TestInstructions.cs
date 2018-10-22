@@ -115,5 +115,23 @@ namespace TestInstructions
                     Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
             }
         }
+
+        [Test]
+        public void testSTA()
+        {
+            ushort addr = 0x0001;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < 100; i++)
+            {
+                cpu.A = (byte)rnd.Next(0,255);
+                cpu.STA(addr);
+
+                Assert.AreEqual(blankMemory[addr], cpu.A);
+            }
+        }
     }
 }

@@ -225,7 +225,7 @@ namespace MOS
         public void STA(ushort address)
         {
             cycleLock.enterCycle();
-            A = getByteFromMemory(address, lockToCycle:false);
+            storeByteInMemory(address, A, lockToCycle:false);
             cycleLock.exitCycle();
         }
 
@@ -280,6 +280,17 @@ namespace MOS
                 cycleLock.exitCycle();
             log.Debug(string.Format("next byte loaded: {0}", b.ToString("x2")));
             return b;
+        }
+
+        private void storeByteInMemory(ushort addr, byte b, bool lockToCycle=true)
+        {
+            if (lockToCycle)
+                cycleLock.enterCycle();
+
+            memory[addr] = b;
+            if (lockToCycle)
+                cycleLock.exitCycle();
+            log.Debug(string.Format("saved byte {0} to address {1}", b.ToString("x2"), addr.ToString("x4")));
         }
 
         private ushort getWordFromMemory(ushort lo, ushort hi)
