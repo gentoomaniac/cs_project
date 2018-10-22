@@ -9,6 +9,7 @@ namespace TestInstructions
 {
    class InstructionTetsts
     {
+        private int NUMBER_TEST_RUNS = 10000;
         [Test]
         public void testORA()
         {
@@ -19,7 +20,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -44,7 +45,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -69,7 +70,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -94,7 +95,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -116,6 +117,7 @@ namespace TestInstructions
                 else if (oldA > 0x80 && ((oldA+blankMemory[addr])%0x0100) < 0x80)
                     Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
                 else
+                    // This fails every now and then the test
                     Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
             }
         }
@@ -129,7 +131,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -152,7 +154,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 cpu.A = (byte)rnd.Next(0,255);
@@ -171,7 +173,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -194,7 +196,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 cpu.X = (byte)rnd.Next(0,255);
@@ -213,7 +215,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
@@ -236,7 +238,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
                 cpu.Y = (byte)rnd.Next(0,255);
@@ -254,7 +256,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 cpu.A = (byte)rnd.Next(0,0xff);
                 cpu.TAX();
@@ -275,7 +277,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 cpu.X = (byte)rnd.Next(0,0xff);
                 cpu.TXA();
@@ -296,7 +298,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 cpu.A = (byte)rnd.Next(0,0xff);
                 cpu.TAY();
@@ -317,7 +319,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 cpu.Y = (byte)rnd.Next(0,0xff);
                 cpu.TYA();
@@ -338,7 +340,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 cpu.S = (byte)rnd.Next(0,0xff);
                 cpu.TSX();
@@ -359,7 +361,7 @@ namespace TestInstructions
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
             Random rnd = new Random();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 cpu.X = (byte)rnd.Next(0,0xff);
                 cpu.TXS();
