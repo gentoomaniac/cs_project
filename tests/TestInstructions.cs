@@ -13,7 +13,7 @@ namespace TestInstructions
         public void testORA()
         {
             byte oldA;
-            ushort addr = 0x002a;
+            ushort addr = 0x00;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -21,6 +21,7 @@ namespace TestInstructions
 
             for (int i = 0; i < 100; i++)
             {
+                addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
@@ -37,7 +38,7 @@ namespace TestInstructions
         public void testAND()
         {
             byte oldA;
-            ushort addr = 0x002a;
+            ushort addr = 0x00;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -45,6 +46,7 @@ namespace TestInstructions
 
             for (int i = 0; i < 100; i++)
             {
+                addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
@@ -61,7 +63,7 @@ namespace TestInstructions
         public void testEOR()
         {
             byte oldA;
-            ushort addr = 0x0001;
+            ushort addr = 0x00;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -69,6 +71,7 @@ namespace TestInstructions
 
             for (int i = 0; i < 100; i++)
             {
+                addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
@@ -85,7 +88,7 @@ namespace TestInstructions
         public void testADC()
         {
             byte oldA;
-            ushort addr = 0x0001;
+            ushort addr = 0x00;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -93,6 +96,7 @@ namespace TestInstructions
 
             for (int i = 0; i < 100; i++)
             {
+                addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
@@ -119,7 +123,7 @@ namespace TestInstructions
         [Test]
         public void testSTA()
         {
-            ushort addr = 0x0001;
+            ushort addr = 0x00;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -127,6 +131,7 @@ namespace TestInstructions
 
             for (int i = 0; i < 100; i++)
             {
+                addr = (ushort)rnd.Next(0,0xffff);
                 cpu.A = (byte)rnd.Next(0,255);
                 cpu.STA(addr);
 
@@ -137,7 +142,7 @@ namespace TestInstructions
         [Test]
         public void testLDX()
         {
-            ushort addr = 0x0001;
+            ushort addr = 0x00;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
