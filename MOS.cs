@@ -211,10 +211,14 @@ namespace MOS
         // A + addr
         public void ADC(ushort address) {
             cycleLock.enterCycle();
-            setProcessorStatusBit(ProcessorStatus.V, isSet:( ((A + memory[address]) & (byte)ProcessorStatus.N) != (A & (byte)ProcessorStatus.N) ));
-            A += getByteFromMemory(address, lockToCycle:false);
+            byte oldA = A;
+            byte memValue = getByteFromMemory(address, lockToCycle:false);
+            A += memValue;
+            setProcessorStatusBit(ProcessorStatus.V, isSet:(checkForOverflow(oldA, A)));
+            setProcessorStatusBit(ProcessorStatus.C, isSet:(oldA + memValue > 0xff));
             setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+
             cycleLock.exitCycle();
         }
 
@@ -243,6 +247,15 @@ namespace MOS
 
         /* HELPERS */
         //ToDo: check Enum and get rid of all the casting
+
+        private bool checkForOverflow(int vOld, int vNew)
+        {
+            if (vOld < 0x80 && vNew >= 0x80)
+                return true;
+            else if (vOld >= 0x80 && vNew < 0x80)
+                return true;
+            return false;
+        }
         private void setProcessorStatusBit(ProcessorStatus s, bool isSet=true)
         {
             if (isSet)
