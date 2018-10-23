@@ -415,5 +415,47 @@ namespace TestInstructions
                 Assert.AreEqual((byte)(oldS-1), cpu.S);
             }
         }
+
+        [Test]
+        public void testPLP()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+            byte oldS;
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                blankMemory[CPU6510.STACK_OFFSET + cpu.S] = (byte)rnd.Next(0,0xff);
+                oldS = cpu.S;
+                cpu.PLP();
+
+                Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + oldS], cpu.P);
+                // stack pointer changed accordingly?
+                Assert.AreEqual((byte)(oldS+1), cpu.S);
+            }
+        }
+
+        [Test]
+        public void testPHP()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+            byte oldS;
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0,0xff);
+                oldS = cpu.S;
+                cpu.PHP();
+
+                Assert.AreEqual(cpu.P, blankMemory[CPU6510.STACK_OFFSET + oldS]);
+                // stack pointer changed accordingly?
+                Assert.AreEqual((byte)(oldS-1), cpu.S);
+            }
+        }
     }
 }

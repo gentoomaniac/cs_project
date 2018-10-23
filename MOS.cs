@@ -358,6 +358,29 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        // PLP (short for "PulL Processor flags") is the mnemonic for a machine language instruction which retrieves a set of status
+        // flags previously "pushed" onto the stack (usually by a PHP instruction) from the stack, and adjusting the stack pointer
+        // to reflect the removal of a byte.
+        public void PLP()
+        {
+            byte value = getByteFromMemory((ushort)(STACK_OFFSET + S), lockToCycle:true);
+            S += 1;
+
+            cycleLock.enterCycle();
+            P = value;
+            cycleLock.exitCycle();
+        }
+
+        // PHP (short for "PusH Processor flags") is the mnemonic for a machine language instruction which stores the current state
+        // of the processor status flags onto the stack, and adjusting the stack pointer to reflect the addition.
+        public void PHP()
+        {
+            cycleLock.enterCycle();
+            storeByteInMemory((ushort)(STACK_OFFSET + S), P, lockToCycle:false);
+            S--;
+            cycleLock.exitCycle();
+        }
+
         /* HELPERS */
         //ToDo: check Enum and get rid of all the casting
         private bool checkForOverflow(int vOld, int vNew)
