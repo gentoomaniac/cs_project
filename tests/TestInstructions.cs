@@ -369,5 +369,30 @@ namespace TestInstructions
                 Assert.AreEqual(cpu.S, cpu.X);
             }
         }
+
+        [Test]
+        public void testPLA()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+            byte oldS;
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                blankMemory[CPU6510.STACK_OFFSET + cpu.S] = (byte)rnd.Next(0,0xff);
+                oldS = cpu.S;
+                cpu.PLA();
+
+                Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + oldS], cpu.A);
+                // zero bit set?
+                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                // stack pointer changed accordingly?
+                Assert.AreEqual((byte)(oldS+1), cpu.S);
+            }
+        }
     }
 }

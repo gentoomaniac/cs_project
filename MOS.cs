@@ -22,7 +22,8 @@ namespace MOS
     // https://en.wikipedia.org/wiki/Endianness#Little-endian
     class CPU6510
     {
-        private static ushort PAGE_SIZE = 256;
+        public static ushort PAGE_SIZE = 256;
+        public static ushort STACK_OFFSET = 0x0100;
 
         /*  Program Counter
 
@@ -58,7 +59,7 @@ namespace MOS
             The Stack pointer can be read and written by transfering
             its value to or from the index register X (see below) with
             the TSX and TXS instructions. */
-        public byte S;
+        public byte S = 0xff;
 
         /*  Processor status
 
@@ -289,6 +290,7 @@ namespace MOS
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (X & (byte)ProcessorStatus.N) != 0 ));
             cycleLock.exitCycle();
         }
+
         public void TXA()
         {
             cycleLock.enterCycle();
@@ -297,6 +299,7 @@ namespace MOS
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
             cycleLock.exitCycle();
         }
+
         public void TAY()
         {
             cycleLock.enterCycle();
@@ -305,6 +308,7 @@ namespace MOS
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (Y & (byte)ProcessorStatus.N) != 0 ));
             cycleLock.exitCycle();
         }
+
         public void TYA()
         {
             cycleLock.enterCycle();
@@ -313,6 +317,7 @@ namespace MOS
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
             cycleLock.exitCycle();
         }
+
         public void TSX()
         {
             cycleLock.enterCycle();
@@ -321,10 +326,35 @@ namespace MOS
             setProcessorStatusBit(ProcessorStatus.N, isSet:( (X & (byte)ProcessorStatus.N) != 0 ));
             cycleLock.exitCycle();
         }
+
         public void TXS()
         {
             cycleLock.enterCycle();
             S = X;
+            cycleLock.exitCycle();
+        }
+
+        // PLA (short for "PulL Accumulator") is the mnemonic for a machine language instruction which retrieves
+        // a byte from the stack and stores it in the accumulator, and adjusts the stack pointer to reflect the removal of that byte.
+        public void PLA()
+        {
+            byte value = getByteFromMemory((ushort)(STACK_OFFSET + S), lockToCycle:true);
+            S += 1;
+
+            cycleLock.enterCycle();
+            A = value;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:( A == 0 ));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:( (A & (byte)ProcessorStatus.N) != 0 ));
+            cycleLock.exitCycle();
+        }
+
+        // PHA (short for "PusH Accumulator") is the mnemonic for a machine language instruction which stores a copy of the current
+        // content of the accumulator onto the stack, and adjusting the stack pointer to reflect the addition.
+        public void PHA()
+        {
+            cycleLock.enterCycle();
+            storeByteInMemory((ushort)(STACK_OFFSET + S), A, lockToCycle:false);
+            S--;
             cycleLock.exitCycle();
         }
 
