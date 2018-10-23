@@ -394,5 +394,26 @@ namespace TestInstructions
                 Assert.AreEqual((byte)(oldS+1), cpu.S);
             }
         }
+
+        [Test]
+        public void testPHA()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+            byte oldS;
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.A = (byte)rnd.Next(0,0xff);
+                oldS = cpu.S;
+                cpu.PHA();
+
+                Assert.AreEqual(cpu.A, blankMemory[CPU6510.STACK_OFFSET + oldS]);
+                // stack pointer changed accordingly?
+                Assert.AreEqual((byte)(oldS-1), cpu.S);
+            }
+        }
     }
 }
