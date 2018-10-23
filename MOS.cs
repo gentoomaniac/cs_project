@@ -141,37 +141,18 @@ namespace MOS
         {
             switch(opcode)
             {
-                case 0x01:
-                    ORA(indexedIndirectAdressing(getNextCodeByte()));
-                    break;
-                case 0x05:
-                    ORA(zeropageAdressing(getNextCodeByte()));
-                    break;
-                case 0x11:
-                    ORA(indirectIndexedZeropageAdressing(getNextCodeByte()));
-                    break;
-                case 0x15:
-                    ORA(zeropageIndexedAdressing(getNextCodeByte(), X));
-                    break;
-                case 0x25:
-                    AND(zeropageAdressing(getNextCodeByte()));
-                    break;
-                case 0x45:
-                    EOR(zeropageAdressing(getNextCodeByte()));
-                    break;
-                case 0x85:
-                    STA(zeropageAdressing(getNextCodeByte()));
-                    break;
-                case 0x8d:
-                    STA(absoluteAdressing(getNextCodeWord()));
-                    break;
-                case 0xa2:
-                    LDX(PC);
-                    break;
-                case 0xea:
-                    NOP();
-                    break;
-
+                case 0x01: ORA(indexedIndirectAdressing(getNextCodeByte())); break;
+                case 0x05: ORA(zeropageAdressing(getNextCodeByte())); break;
+                case 0x08: PHP(); break;
+                case 0x11: ORA(indirectIndexedZeropageAdressing(getNextCodeByte())); break;
+                case 0x15: ORA(zeropageIndexedAdressing(getNextCodeByte(), X)); break;
+                case 0x25: AND(zeropageAdressing(getNextCodeByte())); break;
+                case 0x28: PLP(); break;
+                case 0x45: EOR(zeropageAdressing(getNextCodeByte())); break;
+                case 0x85: STA(zeropageAdressing(getNextCodeByte())); break;
+                case 0x8d: STA(absoluteAdressing(getNextCodeWord())); break;
+                case 0xa2: LDX(PC); break;
+                case 0xea: NOP(); break;
                 default:
                     log.Debug(string.Format("0x{0} is an unimplemented Opcode", opcode.ToString("x2")));
                     //throw new IllegalOpcodeException(string.Format("0x{0} is an illigal Opcode", opcode.ToString("x2")));
