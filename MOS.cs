@@ -149,9 +149,17 @@ namespace MOS
                 case 0x25: AND(zeropageAdressing(getNextCodeByte())); break;
                 case 0x28: PLP(); break;
                 case 0x45: EOR(zeropageAdressing(getNextCodeByte())); break;
+                case 0x48: PHA(); break;
+                case 0x68: PLA(); break;
                 case 0x85: STA(zeropageAdressing(getNextCodeByte())); break;
+                case 0x8a: TXA(); break;
                 case 0x8d: STA(absoluteAdressing(getNextCodeWord())); break;
+                case 0x98: TYA(); break;
+                case 0x9a: TXS(); break;
                 case 0xa2: LDX(PC); break;
+                case 0xa8: TAY(); break;
+                case 0xaa: TAX(); break;
+                case 0xba: TSX(); break;
                 case 0xea: NOP(); break;
                 default:
                     log.Debug(string.Format("0x{0} is an unimplemented Opcode", opcode.ToString("x2")));
