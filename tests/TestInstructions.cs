@@ -206,6 +206,56 @@ namespace TestInstructions
         }
 
         [Test]
+        public void testCPX()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.X = (byte)rnd.Next(0,255);
+                cpu.CPX(addr);
+
+                // zero bit set?
+                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((cpu.X - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(((cpu.X & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testCPY()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.Y = (byte)rnd.Next(0,255);
+                cpu.CPY(addr);
+
+                // zero bit set?
+                Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((cpu.Y - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(((cpu.Y & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
         public void testLDA()
         {
             ushort addr = 0x00;

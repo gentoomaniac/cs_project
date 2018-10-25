@@ -238,6 +238,26 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void CPX(ushort address) {
+            cycleLock.enterCycle();
+            byte memValue = getByteFromMemory(address, lockToCycle:false);
+            setProcessorStatusBit(ProcessorStatus.C, isSet:(X - memValue < 0x00));
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(X == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((X & (byte)ProcessorStatus.N) != 0));
+
+            cycleLock.exitCycle();
+        }
+
+        public void CPY(ushort address) {
+            cycleLock.enterCycle();
+            byte memValue = getByteFromMemory(address, lockToCycle:false);
+            setProcessorStatusBit(ProcessorStatus.C, isSet:(Y - memValue < 0x00));
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(Y == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((Y & (byte)ProcessorStatus.N) != 0));
+
+            cycleLock.exitCycle();
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
