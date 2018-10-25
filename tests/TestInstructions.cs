@@ -43,7 +43,7 @@ namespace TestInstructions
         public void testORA()
         {
             byte oldA;
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -68,7 +68,7 @@ namespace TestInstructions
         public void testAND()
         {
             byte oldA;
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -93,7 +93,7 @@ namespace TestInstructions
         public void testEOR()
         {
             byte oldA;
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -118,7 +118,7 @@ namespace TestInstructions
         public void testADC()
         {
             byte oldA;
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -151,7 +151,7 @@ namespace TestInstructions
         public void testSBC()
         {
             byte oldA;
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -183,7 +183,7 @@ namespace TestInstructions
         [Test]
         public void testCMP()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -208,7 +208,7 @@ namespace TestInstructions
         [Test]
         public void testCPX()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -233,7 +233,7 @@ namespace TestInstructions
         [Test]
         public void testCPY()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -258,7 +258,8 @@ namespace TestInstructions
         [Test]
         public void testDEC()
         {
-            ushort addr = 0x00;
+            byte num;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -267,7 +268,7 @@ namespace TestInstructions
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
-                byte num = (byte)rnd.Next(0,255);
+                num = (byte)rnd.Next(0,255);
                 blankMemory[addr] = num;
                 cpu.DEC(addr);
 
@@ -282,6 +283,7 @@ namespace TestInstructions
         [Test]
         public void testDEX()
         {
+            byte num;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -289,7 +291,7 @@ namespace TestInstructions
 
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
-                byte num = (byte)rnd.Next(0,255);
+                num = (byte)rnd.Next(0,255);
                 cpu.X = num;
                 cpu.DEX();
 
@@ -304,6 +306,7 @@ namespace TestInstructions
         [Test]
         public void testDEY()
         {
+            byte num;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -311,7 +314,7 @@ namespace TestInstructions
 
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
-                byte num = (byte)rnd.Next(0,255);
+                num = (byte)rnd.Next(0,255);
                 cpu.Y = num;
                 cpu.DEY();
 
@@ -449,7 +452,7 @@ namespace TestInstructions
         [Test]
         public void testLDA()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -472,7 +475,7 @@ namespace TestInstructions
         [Test]
         public void testSTA()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -491,7 +494,7 @@ namespace TestInstructions
         [Test]
         public void testLDX()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -514,7 +517,7 @@ namespace TestInstructions
         [Test]
         public void testSTX()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -533,7 +536,7 @@ namespace TestInstructions
         [Test]
         public void testLDY()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -556,7 +559,7 @@ namespace TestInstructions
         [Test]
         public void testSTY()
         {
-            ushort addr = 0x00;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
