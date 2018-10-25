@@ -159,7 +159,7 @@ namespace TestInstructions
 
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
-                addr = 0x01;//ushort)rnd.Next(0,0xffff);
+                addr = (ushort)rnd.Next(0,0xffff);
                 blankMemory[addr] = (byte)rnd.Next(0,255);
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
@@ -177,6 +177,31 @@ namespace TestInstructions
                     Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
                 else
                     Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
+            }
+        }
+
+        [Test]
+        public void testCMP()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.A = (byte)rnd.Next(0,255);
+                cpu.CMP(addr);
+
+                // zero bit set?
+                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((cpu.A - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(((cpu.A & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
