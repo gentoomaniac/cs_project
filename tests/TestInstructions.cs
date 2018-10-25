@@ -326,7 +326,8 @@ namespace TestInstructions
         [Test]
         public void testINC()
         {
-            ushort addr = 0x00;
+            byte num;
+            ushort addr;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -335,7 +336,7 @@ namespace TestInstructions
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
                 addr = (ushort)rnd.Next(0,0xffff);
-                byte num = (byte)rnd.Next(0,255);
+                num = (byte)rnd.Next(0,255);
                 blankMemory[addr] = num;
                 cpu.INC(addr);
 
@@ -350,6 +351,7 @@ namespace TestInstructions
         [Test]
         public void testINX()
         {
+            byte num;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -357,7 +359,7 @@ namespace TestInstructions
 
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
-                byte num = (byte)rnd.Next(0,255);
+                num = (byte)rnd.Next(0,255);
                 cpu.X = num;
                 cpu.INX();
 
@@ -372,6 +374,7 @@ namespace TestInstructions
         [Test]
         public void testINY()
         {
+            byte num;
             byte[] blankMemory = new byte[65536];
             Lock cpuLock = new AlwaysOpenLock();
             CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
@@ -379,7 +382,7 @@ namespace TestInstructions
 
             for (int i = 0; i < NUMBER_TEST_RUNS; i++)
             {
-                byte num = (byte)rnd.Next(0,255);
+                num = (byte)rnd.Next(0,255);
                 cpu.Y = num;
                 cpu.INY();
 
@@ -388,6 +391,58 @@ namespace TestInstructions
                 Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
                 Assert.AreEqual(((cpu.Y & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testASL()
+        {
+            byte num;
+            ushort addr;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                num = (byte)rnd.Next(0,255);
+                blankMemory[addr] = num;
+                cpu.ASL(addr);
+
+                Assert.AreEqual((byte)(num<<1), blankMemory[addr]);
+                // zero bit set?
+                Assert.AreEqual(blankMemory[addr] == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((num & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual((blankMemory[addr] & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testASL_A()
+        {
+            byte num;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                num = (byte)rnd.Next(0,255);
+                cpu.A = num;
+                cpu.ASL();
+
+                Assert.AreEqual((byte)(num<<1), cpu.A);
+                // zero bit set?
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((num & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual((cpu.A & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 

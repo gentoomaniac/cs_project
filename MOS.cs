@@ -314,6 +314,28 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void ASL() {
+            cycleLock.enterCycle();
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((A & (byte)ProcessorStatus.N) != 0));
+            A = (byte)(A << 1);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(A == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((A & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
+        public void ASL(ushort address) {
+            byte memValue = getByteFromMemory(address, lockToCycle:true);
+
+            cycleLock.enterCycle();
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            memValue = (byte)(memValue << 1);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(memValue == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+
+            storeByteInMemory(address, memValue, lockToCycle: true);
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
