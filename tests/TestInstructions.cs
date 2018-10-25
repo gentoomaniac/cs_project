@@ -256,6 +256,30 @@ namespace TestInstructions
         }
 
         [Test]
+        public void testDEC()
+        {
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                byte num = (byte)rnd.Next(0,255);
+                blankMemory[addr] = num;
+                cpu.DEC(addr);
+
+                Assert.AreEqual((byte)(num-1), blankMemory[addr]);
+                // zero bit set?
+                Assert.AreEqual((blankMemory[addr] == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // negative bit set?
+                Assert.AreEqual(((blankMemory[addr] & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
         public void testLDA()
         {
             ushort addr = 0x00;

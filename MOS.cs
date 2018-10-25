@@ -258,6 +258,18 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void DEC(ushort address) {
+            byte memValue = getByteFromMemory(address, lockToCycle:true);
+
+            cycleLock.enterCycle();
+            memValue -= 1;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(memValue == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+
+            storeByteInMemory(address, memValue, lockToCycle: true);
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
