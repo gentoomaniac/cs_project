@@ -286,6 +286,34 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        public void INC(ushort address) {
+            byte memValue = getByteFromMemory(address, lockToCycle:true);
+
+            cycleLock.enterCycle();
+            memValue += 1;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(memValue == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+
+            storeByteInMemory(address, memValue, lockToCycle: true);
+        }
+
+         public void INX() {
+            cycleLock.enterCycle();
+            X += 1;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(X == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((X & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
+         public void INY() {
+            cycleLock.enterCycle();
+            Y += 1;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(Y == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((Y & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
