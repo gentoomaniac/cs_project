@@ -10,6 +10,35 @@ namespace TestInstructions
    class InstructionTetsts
     {
         private int NUMBER_TEST_RUNS = 10000;
+
+        [Test]
+        public void testCheckForOverflow()
+        {
+            Random rnd = new Random();
+
+            Assert.True(CPU6510.checkForOverflow(0x80, 0x7f));  // underflow
+            Assert.True(CPU6510.checkForOverflow(0x7f, 0x80));  // overflow
+            Assert.False(CPU6510.checkForOverflow(0x00, 0x00));
+            Assert.False(CPU6510.checkForOverflow(0x80, 0x81));
+            Assert.False(CPU6510.checkForOverflow(0x81, 0x80));
+            Assert.False(CPU6510.checkForOverflow(0x7e, 0x7f));
+            Assert.False(CPU6510.checkForOverflow(0x7f, 0x7e));
+
+            // overflow
+            for (int i = 0; i < 1000; i++){
+                Assert.True(CPU6510.checkForOverflow((byte)rnd.Next(0x00,0x7f), (byte)rnd.Next(0x80, 0xff)));
+            }
+            // underflow
+            for (int i = 0; i < 1000; i++){
+                Assert.True(CPU6510.checkForOverflow((byte)rnd.Next(0x80,0xff), (byte)rnd.Next(0x00, 0x7f)));
+            }
+
+            for (int i = 0; i < 1000; i++){
+                Assert.False(CPU6510.checkForOverflow((byte)rnd.Next(0x00,0x7f), (byte)rnd.Next(0x00, 0x7f)));
+                Assert.False(CPU6510.checkForOverflow((byte)rnd.Next(0x80,0xff), (byte)rnd.Next(0x80, 0xff)));
+            }
+        }
+
         [Test]
         public void testORA()
         {
@@ -107,17 +136,46 @@ namespace TestInstructions
                 // zero bit set?
                 Assert.True((cpu.A == 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
-                Assert.True((oldA+blankMemory[addr] > 0xff) == cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                Assert.True((oldA + blankMemory[addr] > 0xff) == cpu.isProcessorStatusBitSet(ProcessorStatus.C));
                 // negative bit set?
-                Assert.True((((oldA+blankMemory[addr])%0x0100) >= 0x80) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
-                // positive > negative overflow?
-                if (oldA < 0x80 && ((oldA+blankMemory[addr])%0x0100) >= 0x80)
-                    Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
-                // negative > positive underflow?  ToDo: can this really happen here?
-                else if (oldA > 0x80 && ((oldA+blankMemory[addr])%0x0100) < 0x80)
+                Assert.True(((cpu.A & 0x80) != 0) == cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                // overflow or underflow?
+                if (CPU6510.checkForOverflow(oldA, cpu.A))
                     Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
                 else
-                    // This fails every now and then the test
+                    Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
+            }
+        }
+
+        [Test]
+        public void testSBC()
+        {
+            byte oldA;
+            ushort addr = 0x00;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = 0x01;//ushort)rnd.Next(0,0xffff);
+                blankMemory[addr] = (byte)rnd.Next(0,255);
+                cpu.A = (byte)rnd.Next(0,255);
+                oldA = cpu.A;
+                cpu.SBC(addr);
+
+                Assert.AreEqual((byte)(oldA-blankMemory[addr]), cpu.A);
+                // zero bit set?
+                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((oldA - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(((cpu.A & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                // overflow or underflow?
+                if (CPU6510.checkForOverflow(oldA, cpu.A))
+                    Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
+                else
                     Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
             }
         }
