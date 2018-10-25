@@ -56,11 +56,12 @@ namespace TestInstructions
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
                 cpu.ORA(addr);
-                Assert.AreEqual((oldA|blankMemory[addr]), cpu.A);
+
+                Assert.AreEqual( oldA | blankMemory[addr], cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -81,11 +82,12 @@ namespace TestInstructions
                 cpu.A = (byte)rnd.Next(0,255);
                 oldA = cpu.A;
                 cpu.AND(addr);
-                Assert.AreEqual((oldA&blankMemory[addr]), cpu.A);
+
+                Assert.AreEqual(oldA & blankMemory[addr], cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -107,11 +109,11 @@ namespace TestInstructions
                 oldA = cpu.A;
                 cpu.EOR(addr);
 
-                Assert.AreEqual((oldA^blankMemory[addr]), cpu.A);
+                Assert.AreEqual(oldA ^ blankMemory[addr], cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
         [Test]
@@ -132,13 +134,13 @@ namespace TestInstructions
                 oldA = cpu.A;
                 cpu.ADC(addr);
 
-                Assert.AreEqual((oldA+blankMemory[addr])%0x0100, cpu.A);
+                Assert.AreEqual((byte)(oldA + blankMemory[addr]), cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
-                Assert.AreEqual((oldA + blankMemory[addr] > 0xff), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                Assert.AreEqual(oldA + blankMemory[addr] > 0xff, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
                 // negative bit set?
-                Assert.AreEqual(((cpu.A & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.A & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
                 // overflow or underflow?
                 if (CPU6510.checkForOverflow(oldA, cpu.A))
                     Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
@@ -165,13 +167,13 @@ namespace TestInstructions
                 oldA = cpu.A;
                 cpu.SBC(addr);
 
-                Assert.AreEqual((byte)(oldA-blankMemory[addr]), cpu.A);
+                Assert.AreEqual((byte)(oldA - blankMemory[addr]), cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
-                Assert.AreEqual((oldA - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                Assert.AreEqual(oldA - blankMemory[addr] < 0x00, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
                 // negative bit set?
-                Assert.AreEqual(((cpu.A & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.A & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
                 // overflow or underflow?
                 if (CPU6510.checkForOverflow(oldA, cpu.A))
                     Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
@@ -197,11 +199,11 @@ namespace TestInstructions
                 cpu.CMP(addr);
 
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
-                Assert.AreEqual((cpu.A - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                Assert.AreEqual(cpu.A - blankMemory[addr] < 0x00, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
                 // negative bit set?
-                Assert.AreEqual(((cpu.A & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.A & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -222,11 +224,11 @@ namespace TestInstructions
                 cpu.CPX(addr);
 
                 // zero bit set?
-                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.X == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
-                Assert.AreEqual((cpu.X - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                Assert.AreEqual(cpu.X - blankMemory[addr] < 0x00, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
                 // negative bit set?
-                Assert.AreEqual(((cpu.X & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.X & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -247,11 +249,11 @@ namespace TestInstructions
                 cpu.CPY(addr);
 
                 // zero bit set?
-                Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.Y == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
-                Assert.AreEqual((cpu.Y - blankMemory[addr] < 0x00), cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                Assert.AreEqual(cpu.Y - blankMemory[addr] < 0x00, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
                 // negative bit set?
-                Assert.AreEqual(((cpu.Y & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.Y & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -272,11 +274,11 @@ namespace TestInstructions
                 blankMemory[addr] = num;
                 cpu.DEC(addr);
 
-                Assert.AreEqual((byte)(num-1), blankMemory[addr]);
+                Assert.AreEqual((byte)(num - 1), blankMemory[addr]);
                 // zero bit set?
-                Assert.AreEqual((blankMemory[addr] == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(blankMemory[addr] == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual(((blankMemory[addr] & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((blankMemory[addr] & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -295,11 +297,11 @@ namespace TestInstructions
                 cpu.X = num;
                 cpu.DEX();
 
-                Assert.AreEqual((byte)(num-1), cpu.X);
+                Assert.AreEqual((byte)(num - 1), cpu.X);
                 // zero bit set?
-                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.X == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual(((cpu.X & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.X & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -318,11 +320,11 @@ namespace TestInstructions
                 cpu.Y = num;
                 cpu.DEY();
 
-                Assert.AreEqual((byte)(num-1), cpu.Y);
+                Assert.AreEqual((byte)(num - 1), cpu.Y);
                 // zero bit set?
-                Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.Y == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual(((cpu.Y & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.Y & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -343,11 +345,11 @@ namespace TestInstructions
                 blankMemory[addr] = num;
                 cpu.INC(addr);
 
-                Assert.AreEqual((byte)(num+1), blankMemory[addr]);
+                Assert.AreEqual((byte)(num + 1), blankMemory[addr]);
                 // zero bit set?
-                Assert.AreEqual((blankMemory[addr] == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(blankMemory[addr] == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual(((blankMemory[addr] & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((blankMemory[addr] & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -366,11 +368,11 @@ namespace TestInstructions
                 cpu.X = num;
                 cpu.INX();
 
-                Assert.AreEqual((byte)(num+1), cpu.X);
+                Assert.AreEqual((byte)(num + 1), cpu.X);
                 // zero bit set?
-                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.X == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual(((cpu.X & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.X & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -389,11 +391,11 @@ namespace TestInstructions
                 cpu.Y = num;
                 cpu.INY();
 
-                Assert.AreEqual((byte)(num+1), cpu.Y);
+                Assert.AreEqual((byte)(num + 1), cpu.Y);
                 // zero bit set?
-                Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.Y == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual(((cpu.Y & 0x80) != 0), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual((cpu.Y & 0x80) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -414,7 +416,7 @@ namespace TestInstructions
                 blankMemory[addr] = num;
                 cpu.ASL(addr);
 
-                Assert.AreEqual((byte)(num<<1), blankMemory[addr]);
+                Assert.AreEqual((byte)(num << 1), blankMemory[addr]);
                 // zero bit set?
                 Assert.AreEqual(blankMemory[addr] == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
@@ -439,7 +441,7 @@ namespace TestInstructions
                 cpu.A = num;
                 cpu.ASL();
 
-                Assert.AreEqual((byte)(num<<1), cpu.A);
+                Assert.AreEqual((byte)(num << 1), cpu.A);
                 // zero bit set?
                 Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // carryover set?
@@ -466,9 +468,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.A, blankMemory[addr]);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -508,9 +510,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.X, blankMemory[addr]);
                 // zero bit set?
-                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.X == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.X >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.X >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -550,9 +552,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.Y, blankMemory[addr]);
                 // zero bit set?
-                Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.Y == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.Y >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.Y >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -590,9 +592,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.X, cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.X == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.X >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.X >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -611,9 +613,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.A, cpu.X);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -632,9 +634,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.Y, cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.Y == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.Y == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.Y >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.Y >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -653,9 +655,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.A, cpu.Y);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -674,9 +676,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(cpu.X, cpu.S);
                 // zero bit set?
-                Assert.AreEqual((cpu.X == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.X == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.X >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.X >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
             }
         }
 
@@ -714,9 +716,9 @@ namespace TestInstructions
 
                 Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + oldS], cpu.A);
                 // zero bit set?
-                Assert.AreEqual((cpu.A == 0), cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
-                Assert.AreEqual((cpu.A >= 0x80), cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+                Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
                 // stack pointer changed accordingly?
                 Assert.AreEqual((byte)(oldS+1), cpu.S);
             }
