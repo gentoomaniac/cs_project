@@ -270,6 +270,22 @@ namespace MOS
             storeByteInMemory(address, memValue, lockToCycle: true);
         }
 
+         public void DEX() {
+            cycleLock.enterCycle();
+            X -= 1;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(X == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((X & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
+         public void DEY() {
+            cycleLock.enterCycle();
+            Y -= 1;
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(Y == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((Y & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
