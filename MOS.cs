@@ -570,6 +570,15 @@ namespace MOS
             cycleLock.exitCycle();
         }
 
+        // BPL (short for "Branch if PLus") is the mnemonic for a machine language instruction which branches, or "jumps", to the address
+        // specified if, and only if the negative flag is clear. If the netagive flag is set when the CPU encounters a BPL instruction,
+        // the CPU will continue at the instruction following the BPL rather than taking the jump.
+        public void BPL(sbyte offset)
+        {
+            if (!isProcessorStatusBitSet(ProcessorStatus.N))
+                PC = (ushort)(PC + offset);
+        }
+
         /* HELPERS */
         public static bool checkForOverflow(byte vOld, byte vNew)
         {

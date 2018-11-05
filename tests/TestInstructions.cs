@@ -990,5 +990,33 @@ namespace TestInstructions
                 Assert.AreEqual((byte)(oldS-1), cpu.S);
             }
         }
+
+        [Test]
+        public void testBPL()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool negativeFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                negativeFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.N, isSet:negativeFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BPL(offset);
+
+                if (negativeFlag)
+                    Assert.AreEqual(oldPC, cpu.PC);
+                else
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+            }
+        }
     }
 }
