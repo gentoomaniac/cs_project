@@ -336,6 +336,34 @@ namespace MOS
             storeByteInMemory(address, memValue, lockToCycle: true);
         }
 
+        public void ROL() {
+            cycleLock.enterCycle();
+            bool oldCarryflag = isProcessorStatusBitSet(ProcessorStatus.C);
+
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((A & (byte)ProcessorStatus.N) != 0));
+            A = (byte)(A << 1);
+            A = setBits(A, 0x01, set:oldCarryflag);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(A == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((A & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
+        public void ROL(ushort address) {
+            byte memValue = getByteFromMemory(address, lockToCycle:true);
+
+            cycleLock.enterCycle();
+            bool oldCarryflag = isProcessorStatusBitSet(ProcessorStatus.C);
+
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            memValue = (byte)(memValue << 1);
+            memValue = setBits(memValue, 0x01, set:oldCarryflag);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(memValue == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+
+            storeByteInMemory(address, memValue, lockToCycle: true);
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
@@ -503,12 +531,20 @@ namespace MOS
         }
 
         //ToDo: check Enum and get rid of all the casting
-        private void setProcessorStatusBit(ProcessorStatus s, bool isSet=true)
+        public void setProcessorStatusBit(ProcessorStatus s, bool isSet=true)
         {
             if (isSet)
                 P = (byte)(P | (byte)s);
             else 
                 P = (byte)(P & (byte)(0xff ^ (byte)s));
+        }
+
+        public static byte setBits(byte value, byte mask, bool set=true)
+        {
+            if (set)
+                return (byte)(value | mask);
+            else
+                return (byte)(value & (byte)(0xff ^ mask));
         }
 
         public bool isProcessorStatusBitSet(ProcessorStatus s)
