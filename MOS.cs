@@ -579,6 +579,42 @@ namespace MOS
                 PC = (ushort)(PC + offset);
         }
 
+        public void BMI(sbyte offset)
+        {
+            if (isProcessorStatusBitSet(ProcessorStatus.N))
+                PC = (ushort)(PC + offset);
+        }
+        public void BVC(sbyte offset)
+        {
+            if (!isProcessorStatusBitSet(ProcessorStatus.V))
+                PC = (ushort)(PC + offset);
+        }
+        public void BVS(sbyte offset)
+        {
+            if (isProcessorStatusBitSet(ProcessorStatus.V))
+                PC = (ushort)(PC + offset);
+        }
+        public void BCC(sbyte offset)
+        {
+            if (!isProcessorStatusBitSet(ProcessorStatus.C))
+                PC = (ushort)(PC + offset);
+        }
+        public void BCS(sbyte offset)
+        {
+            if (isProcessorStatusBitSet(ProcessorStatus.C))
+                PC = (ushort)(PC + offset);
+        }
+        public void BNE(sbyte offset)
+        {
+            if (!isProcessorStatusBitSet(ProcessorStatus.Z))
+                PC = (ushort)(PC + offset);
+        }
+        public void BEQ(sbyte offset)
+        {
+            if (isProcessorStatusBitSet(ProcessorStatus.Z))
+                PC = (ushort)(PC + offset);
+        }
+
         /* HELPERS */
         public static bool checkForOverflow(byte vOld, byte vNew)
         {

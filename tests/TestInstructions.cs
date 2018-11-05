@@ -1018,5 +1018,201 @@ namespace TestInstructions
                     Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
             }
         }
+
+        [Test]
+        public void testBMI()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool negativeFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                negativeFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.N, isSet:negativeFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BMI(offset);
+
+                if (negativeFlag)
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+                else
+                    Assert.AreEqual(oldPC, cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBVC()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool overflowFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                overflowFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.V, isSet:overflowFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BVC(offset);
+
+                if (overflowFlag)
+                    Assert.AreEqual(oldPC, cpu.PC);
+                else
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBVS()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool overflowFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                overflowFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.V, isSet:overflowFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BVS(offset);
+
+                if (overflowFlag)
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+                else
+                    Assert.AreEqual(oldPC, cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBCC()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool carryFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                carryFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.C, isSet:carryFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BCC(offset);
+
+                if (carryFlag)
+                    Assert.AreEqual(oldPC, cpu.PC);
+                else
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBCS()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool carryFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                carryFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.C, isSet:carryFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BCS(offset);
+
+                if (carryFlag)
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+                else
+                    Assert.AreEqual(oldPC, cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBNE()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool zeroFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                zeroFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.Z, isSet:zeroFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BNE(offset);
+
+                if (zeroFlag)
+                    Assert.AreEqual(oldPC, cpu.PC);
+                else
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBEQ()
+        {
+            sbyte offset;
+            ushort oldPC;
+            bool zeroFlag;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                zeroFlag = rnd.Next(0, 1) == 1;
+                cpu.setProcessorStatusBit(ProcessorStatus.Z, isSet:zeroFlag);
+                offset = (sbyte)rnd.Next(0x00, 0xff);
+                cpu.PC = (ushort)rnd.Next(0, 0xffff);
+                oldPC = cpu.PC;
+
+                cpu.BEQ(offset);
+
+                if (zeroFlag)
+                    Assert.AreEqual((ushort)(oldPC+offset), cpu.PC);
+                else
+                    Assert.AreEqual(oldPC, cpu.PC);
+            }
+        }
     }
 }
