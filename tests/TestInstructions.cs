@@ -539,6 +539,123 @@ namespace TestInstructions
         }
 
         [Test]
+        public void testLSR()
+        {
+            byte num;
+            ushort addr;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0,0xffff);
+                num = (byte)rnd.Next(0,255);
+                blankMemory[addr] = num;
+                cpu.LSR(addr);
+
+                Assert.AreEqual((byte)(num >> 1), blankMemory[addr]);
+                // zero bit set?
+                Assert.AreEqual(blankMemory[addr] == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((num & 0x01) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(false, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testLSR_A()
+        {
+            byte num;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                num = (byte)rnd.Next(0,255);
+
+                cpu.A = num;
+                cpu.LSR();
+
+                Assert.AreEqual((byte)(num >> 1), cpu.A);
+                // zero bit set?
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((num & 0x01) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(false, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testROR()
+        {
+            byte carryflag;
+            byte num;
+            byte newNum;
+            ushort addr;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                carryflag = (byte)rnd.Next(0, 1);
+                cpu.setProcessorStatusBit(ProcessorStatus.C, isSet: carryflag == 1);
+                addr = (ushort)rnd.Next(0,0xffff);
+                num = (byte)rnd.Next(0,255);
+                newNum = CPU6510.setBits((byte)(num >> 1), 0x80, set: carryflag == 1);
+
+                blankMemory[addr] = num;
+                cpu.ROR(addr);
+
+                Assert.AreEqual(newNum, blankMemory[addr]);
+                // zero bit set?
+                Assert.AreEqual(blankMemory[addr] == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((num & 0x01) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(false, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
+        public void testROR_A()
+        {
+            byte carryflag;
+            byte num;
+            byte newNum;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                carryflag = (byte)rnd.Next(0, 1);
+                cpu.setProcessorStatusBit(ProcessorStatus.C, isSet: carryflag == 1);
+                num = (byte)rnd.Next(0,255);
+                newNum = CPU6510.setBits((byte)(num >> 1), 0x80, set: carryflag == 1);
+
+               cpu.A = num;
+                cpu.ROR();
+
+                Assert.AreEqual(newNum, cpu.A);
+                // zero bit set?
+                Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+                // carryover set?
+                Assert.AreEqual((num & 0x01) != 0, cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+                // negative bit set?
+                Assert.AreEqual(false, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
+            }
+        }
+
+        [Test]
         public void testLDA()
         {
             ushort addr;

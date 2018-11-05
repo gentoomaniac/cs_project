@@ -364,6 +364,56 @@ namespace MOS
             storeByteInMemory(address, memValue, lockToCycle: true);
         }
 
+        public void LSR() {
+            cycleLock.enterCycle();
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((A & 0x01) != 0));
+            A = (byte)(A >> 1);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(A == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((A & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
+        public void LSR(ushort address) {
+            byte memValue = getByteFromMemory(address, lockToCycle:true);
+
+            cycleLock.enterCycle();
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((memValue & 0x01) != 0));
+            memValue = (byte)(memValue >> 1);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(memValue == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+
+            storeByteInMemory(address, memValue, lockToCycle: true);
+        }
+
+        public void ROR() {
+            cycleLock.enterCycle();
+            bool oldCarryflag = isProcessorStatusBitSet(ProcessorStatus.C);
+
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((A & 0x01) != 0));
+            A = (byte)(A >> 1);
+            A = setBits(A, 0x80, set:oldCarryflag);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(A == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((A & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+        }
+
+        public void ROR(ushort address) {
+            byte memValue = getByteFromMemory(address, lockToCycle:true);
+
+            cycleLock.enterCycle();
+            bool oldCarryflag = isProcessorStatusBitSet(ProcessorStatus.C);
+
+            setProcessorStatusBit(ProcessorStatus.C, isSet:((memValue & 0x01) != 0));
+            memValue = (byte)(memValue >> 1);
+            memValue = setBits(memValue, 0x80, set:oldCarryflag);
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(memValue == 0));
+            setProcessorStatusBit(ProcessorStatus.N, isSet:((memValue & (byte)ProcessorStatus.N) != 0));
+            cycleLock.exitCycle();
+
+            storeByteInMemory(address, memValue, lockToCycle: true);
+        }
+
         public void NOP()
         {
             cycleLock.enterCycle();
