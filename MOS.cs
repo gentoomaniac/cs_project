@@ -531,8 +531,7 @@ namespace MOS
         // a byte from the stack and stores it in the accumulator, and adjusts the stack pointer to reflect the removal of that byte.
         public void PLA()
         {
-            byte value = getByteFromMemory((ushort)(STACK_OFFSET + S), lockToCycle:true);
-            S += 1;
+            byte value = pop(lockToCycle:true);
 
             cycleLock.enterCycle();
             A = value;
@@ -545,10 +544,7 @@ namespace MOS
         // content of the accumulator onto the stack, and adjusting the stack pointer to reflect the addition.
         public void PHA()
         {
-            cycleLock.enterCycle();
-            storeByteInMemory((ushort)(STACK_OFFSET + S), A, lockToCycle:false);
-            S--;
-            cycleLock.exitCycle();
+            push(A, lockToCycle:false);
         }
 
         // PLP (short for "PulL Processor flags") is the mnemonic for a machine language instruction which retrieves a set of status
@@ -556,8 +552,7 @@ namespace MOS
         // to reflect the removal of a byte.
         public void PLP()
         {
-            byte value = getByteFromMemory((ushort)(STACK_OFFSET + S), lockToCycle:true);
-            S += 1;
+            byte value = pop(lockToCycle:true);
 
             cycleLock.enterCycle();
             P = value;
@@ -568,10 +563,7 @@ namespace MOS
         // of the processor status flags onto the stack, and adjusting the stack pointer to reflect the addition.
         public void PHP()
         {
-            cycleLock.enterCycle();
-            storeByteInMemory((ushort)(STACK_OFFSET + S), P, lockToCycle:false);
-            S--;
-            cycleLock.exitCycle();
+            push(P, lockToCycle:true);
         }
 
         // BPL (short for "Branch if PLus") is the mnemonic for a machine language instruction which branches, or "jumps", to the address

@@ -918,13 +918,11 @@ namespace TestInstructions
                 oldS = cpu.S;
                 cpu.PLA();
 
-                Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + oldS], cpu.A);
+                Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + (byte)(oldS+1)], cpu.A);
                 // zero bit set?
                 Assert.AreEqual(cpu.A == 0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
                 // negative bit set?
                 Assert.AreEqual(cpu.A >= 0x80, cpu.isProcessorStatusBitSet(ProcessorStatus.N));
-                // stack pointer changed accordingly?
-                Assert.AreEqual((byte)(oldS+1), cpu.S);
             }
         }
 
@@ -944,8 +942,6 @@ namespace TestInstructions
                 cpu.PHA();
 
                 Assert.AreEqual(cpu.A, blankMemory[CPU6510.STACK_OFFSET + oldS]);
-                // stack pointer changed accordingly?
-                Assert.AreEqual((byte)(oldS-1), cpu.S);
             }
         }
 
@@ -964,9 +960,7 @@ namespace TestInstructions
                 oldS = cpu.S;
                 cpu.PLP();
 
-                Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + oldS], cpu.P);
-                // stack pointer changed accordingly?
-                Assert.AreEqual((byte)(oldS+1), cpu.S);
+                Assert.AreEqual(blankMemory[CPU6510.STACK_OFFSET + (byte)(oldS+1)], cpu.P);
             }
         }
 
@@ -986,8 +980,6 @@ namespace TestInstructions
                 cpu.PHP();
 
                 Assert.AreEqual(cpu.P, blankMemory[CPU6510.STACK_OFFSET + oldS]);
-                // stack pointer changed accordingly?
-                Assert.AreEqual((byte)(oldS-1), cpu.S);
             }
         }
 
