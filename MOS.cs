@@ -49,7 +49,7 @@ namespace MOS
         public byte PCL
         {
             get { return (byte)(PC&0x00ff); }
-            set { PC = (ushort)((PC&0x00) | value); }
+            set { PC = (ushort)((PC&0xff00) | value); }
         }
 
         /*  Stack pointer
