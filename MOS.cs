@@ -25,6 +25,10 @@ namespace MOS
         public static ushort PAGE_SIZE = 256;
         public static ushort STACK_OFFSET = 0x0100;
 
+        public static ushort NMI_VECTOR = 0xfffa;
+        public static ushort RESET_VECTOR = 0xfffc;
+        public static ushort IRQ_VECTOR = 0xfffe;
+
         /*  Program Counter
 
             This register points the address from which the next
