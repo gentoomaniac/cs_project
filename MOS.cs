@@ -620,6 +620,28 @@ namespace MOS
         }
 
         /* HELPERS */
+        // Save byte to stack
+        public void push(byte value, bool lockToCycle=true)
+        {
+            if (lockToCycle)
+                cycleLock.enterCycle();
+            storeByteInMemory((ushort)(STACK_OFFSET+S), value, lockToCycle:false);
+            S--;
+            if (lockToCycle)
+                cycleLock.exitCycle();
+        }
+        public byte pop(bool lockToCycle=true)
+        {
+            if (lockToCycle)
+                cycleLock.enterCycle();
+            byte value = getByteFromMemory((ushort)(STACK_OFFSET+S), lockToCycle:false);
+            S++;
+            if (lockToCycle)
+                cycleLock.exitCycle();
+
+            return value;
+        }
+
         public static bool checkForOverflow(byte vOld, byte vNew)
         {
             if ((vOld & 0x80) == 0 && (vNew & 0x80) !=0)
