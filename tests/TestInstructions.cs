@@ -1214,5 +1214,41 @@ namespace TestInstructions
                     Assert.AreEqual(oldPC, cpu.PC);
             }
         }
+
+        [Test]
+        public void testBRK()
+        {
+            byte newPCH, newPCL;
+            byte oldS;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = 0x00;
+                cpu.PC = (ushort)rnd.Next(0x00, 0xff00);
+                newPCH = (byte)((cpu.PC+2)>>8);
+                newPCL = (byte)((cpu.PC+2)&0x00ff);
+                oldS = (byte)rnd.Next(0x00, 0xff);
+                cpu.S = oldS;
+                blankMemory[CPU6510.IRQ_VECTOR] = (byte)rnd.Next(0x00, 0xff);
+                blankMemory[CPU6510.IRQ_VECTOR+1] = (byte)rnd.Next(0x00, 0xff);
+
+                cpu.BRK();
+
+                Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.B));
+                Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.I));
+
+                Assert.AreEqual(newPCH, blankMemory[CPU6510.STACK_OFFSET + (byte)(cpu.S+3)]);
+                Assert.AreEqual(newPCL, blankMemory[CPU6510.STACK_OFFSET + (byte)(cpu.S+2)]);
+                Assert.AreEqual(cpu.P, blankMemory[CPU6510.STACK_OFFSET + (byte)(cpu.S+1)]);
+                Assert.AreEqual((byte)(oldS-3), cpu.S);
+
+                Assert.AreEqual(blankMemory[CPU6510.IRQ_VECTOR], cpu.PCL);
+                Assert.AreEqual(blankMemory[CPU6510.IRQ_VECTOR+1], cpu.PCH);
+            }
+        }
     }
 }

@@ -619,6 +619,25 @@ namespace MOS
                 PC = (ushort)(PC + offset);
         }
 
+        // BRK (short for "BReaKpoint") is the mnemonic for a machine language instruction which sets the break and interrupt
+        // flags, increments the program counter by two and stores it along with the processor status flags onto the stack.
+        // Finally it raises an IRQ interrupt event (load IRQ_VECTOR into PC).
+        public void BRK()
+        {
+
+            setProcessorStatusBit(ProcessorStatus.B, isSet:true);
+            setProcessorStatusBit(ProcessorStatus.I, isSet:true);
+
+            PC += 2;
+
+            push(PCH, lockToCycle:true);
+            push(PCL, lockToCycle:true);
+            push(P, lockToCycle:true);
+
+            PC = getWordFromMemory(IRQ_VECTOR, (ushort)(IRQ_VECTOR+1));
+
+        }
+
         /* HELPERS */
         // Save byte to stack
         public void push(byte value, bool lockToCycle=true)
