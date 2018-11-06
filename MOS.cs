@@ -638,6 +638,17 @@ namespace MOS
 
         }
 
+        // RTI (short for "ReTurn from Interrupt") is the mnemonic for a machine language instruction which returns the CPU
+        // from an interrupt service routine to the "mainline" program that was interrupted. It does this by pulling first
+        // the processor status flags (similar to PLP), and then the program counter, from the stack, effectively handling
+        // program execution back to the address pulled from the stack.
+        public void RTI()
+        {
+            P = pop(lockToCycle:true);
+            PCL = pop(lockToCycle:true);
+            PCH = pop(lockToCycle:true);
+        }
+
         /* HELPERS */
         // Save byte to stack
         public void push(byte value, bool lockToCycle=true)
@@ -653,8 +664,8 @@ namespace MOS
         {
             if (lockToCycle)
                 cycleLock.enterCycle();
-            byte value = getByteFromMemory((ushort)(STACK_OFFSET+S), lockToCycle:false);
             S++;
+            byte value = getByteFromMemory((ushort)(STACK_OFFSET+S), lockToCycle:false);
             if (lockToCycle)
                 cycleLock.exitCycle();
 

@@ -1250,5 +1250,33 @@ namespace TestInstructions
                 Assert.AreEqual(blankMemory[CPU6510.IRQ_VECTOR+1], cpu.PCH);
             }
         }
+
+        [Test]
+        public void testRTI()
+        {
+            byte pch, pcl, p;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.S = (byte)rnd.Next(0x00, 0xff);
+                pch = (byte)rnd.Next();
+                pcl = (byte)rnd.Next();
+                p = (byte)rnd.Next();
+
+                cpu.push(pch);
+                cpu.push(pcl);
+                cpu.push(p);
+
+                cpu.RTI();
+
+                Assert.AreEqual(p, cpu.P);
+                Assert.AreEqual(pcl, cpu.PCL);
+                Assert.AreEqual(pch, cpu.PCH);
+            }
+        }
     }
 }
