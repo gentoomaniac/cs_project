@@ -1325,5 +1325,159 @@ namespace TestInstructions
                 Assert.AreEqual((ushort)(pc+1), cpu.PC);
             }
         }
+
+        [Test]
+        public void testJMP()
+        {
+            ushort address;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                address = (ushort)rnd.Next(0x0000, 0xffff);
+
+                cpu.JMP(address);
+
+                Assert.AreEqual(address, cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testBIT()
+        {
+            ushort address;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                address = (ushort)rnd.Next(0x0000, 0xffff);
+                blankMemory[address] = (byte)rnd.Next(0x00, 0xff);
+                cpu.A = (byte)rnd.Next(0x00, 0xff);
+
+                cpu.BIT(address);
+
+                Assert.AreEqual(blankMemory[address]&(byte)ProcessorStatus.N, cpu.P&(byte)ProcessorStatus.N);
+                Assert.AreEqual(blankMemory[address]&(byte)ProcessorStatus.V, cpu.P&(byte)ProcessorStatus.V);
+                Assert.AreEqual((blankMemory[address]&cpu.A)==0, cpu.isProcessorStatusBitSet(ProcessorStatus.Z));
+            }
+        }
+
+        [Test]
+        public void testCLC()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.CLC();
+                Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+            }
+        }
+
+        [Test]
+        public void testSEC()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.SEC();
+                Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.C));
+            }
+        }
+
+        [Test]
+        public void testCLD()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.CLD();
+                Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.D));
+            }
+        }
+
+        [Test]
+        public void testSED()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.SED();
+                Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.D));
+            }
+        }
+
+        [Test]
+        public void testCLI()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.CLI();
+                Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.I));
+            }
+        }
+
+        [Test]
+        public void testSEI()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.SEI();
+                Assert.True(cpu.isProcessorStatusBitSet(ProcessorStatus.I));
+            }
+        }
+
+        [Test]
+        public void testCLV()
+        {
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                cpu.P = (byte)rnd.Next(0x00, 0xff);
+                cpu.CLV();
+                Assert.False(cpu.isProcessorStatusBitSet(ProcessorStatus.V));
+            }
+        }
     }
 }

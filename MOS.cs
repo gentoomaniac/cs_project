@@ -418,12 +418,6 @@ namespace MOS
             storeByteInMemory(address, memValue, lockToCycle: true);
         }
 
-        public void NOP()
-        {
-            cycleLock.enterCycle();
-            cycleLock.exitCycle();
-        }
-
         /* ************************************************ */
         /* * Move commands                                * */
         /* ************************************************ */
@@ -671,6 +665,68 @@ namespace MOS
             PC++;
         }
 
+        // JMP (short for "JuMP") is the mnemonic for a machine language instruction which unconditionally transfers program
+        // execution to the specified address. To those familiar with BASIC programming; this is the machine language equivalent to GOTO.
+        public void JMP(ushort address)
+        {
+            PC = address;
+        }
+        // BIT (short for "BIT test") is the mnemonic for a machine language instruction which tests specific bits in the contents of the
+        // address specified, and sets the zero, negative, and overflow flags accordingly, all without affecting the contents of the accumulator.
+        // - Bit 7 (weight 128/$80; the most sigificant bit) is transferred directly into the negative flag.
+        // - Bit 6 (weight 64/$40) is transferred directly into the overflow flag.
+        // - A bit-wise "and" is performed between the contents of the designated memory address and that of the accumulator; if the result of this is a zero byte, the zero flag is set.
+        public void BIT(ushort address)
+        {
+            cycleLock.enterCycle();
+            byte value = getByteFromMemory(address, lockToCycle: false);
+            setProcessorStatusBit(ProcessorStatus.N, isSet:isBitSet(value, (byte)ProcessorStatus.N));
+            setProcessorStatusBit(ProcessorStatus.V, isSet:isBitSet(value, (byte)ProcessorStatus.V));
+            setProcessorStatusBit(ProcessorStatus.Z, isSet:(A&value)==0);
+            cycleLock.exitCycle();
+        }
+
+        public void CLC()
+        {
+            setProcessorStatusBit(ProcessorStatus.C, isSet:false);
+        }
+
+        public void SEC()
+        {
+            setProcessorStatusBit(ProcessorStatus.C, isSet:true);
+        }
+
+        public void CLD()
+        {
+            setProcessorStatusBit(ProcessorStatus.D, isSet:false);
+        }
+
+        public void SED()
+        {
+            setProcessorStatusBit(ProcessorStatus.D, isSet:true);
+        }
+
+        public void CLI()
+        {
+            setProcessorStatusBit(ProcessorStatus.I, isSet:false);
+        }
+
+        public void SEI()
+        {
+            setProcessorStatusBit(ProcessorStatus.I, isSet:true);
+        }
+
+        public void CLV()
+        {
+            setProcessorStatusBit(ProcessorStatus.V, isSet:false);
+        }
+
+        public void NOP()
+        {
+            cycleLock.enterCycle();
+            cycleLock.exitCycle();
+        }
+
         /* HELPERS */
         // Save byte to stack
         public void push(byte value, bool lockToCycle=true)
@@ -722,7 +778,12 @@ namespace MOS
 
         public bool isProcessorStatusBitSet(ProcessorStatus s)
         {
-            return (P & (byte)s) != 0;
+            return isBitSet(P, (byte)s);
+        }
+
+        public static bool isBitSet(int value, int bitmask)
+        {
+            return (value & bitmask) != 0;
         }
 
         private byte getByteFromMemory(ushort addr, bool lockToCycle=true)
