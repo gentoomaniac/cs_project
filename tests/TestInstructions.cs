@@ -1270,5 +1270,60 @@ namespace TestInstructions
                 Assert.AreEqual(pch, cpu.PCH);
             }
         }
+
+        [Test]
+        public void testJSR()
+        {
+            ushort addr;
+            byte pch, pcl, s;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                addr = (ushort)rnd.Next(0x0000, 0xffff);
+                s = (byte)rnd.Next(0x00, 0xff);
+                cpu.S  = s;
+                cpu.PC = (ushort)rnd.Next(0x0000, 0xffff);
+                pch = (byte)((cpu.PC+2)>>8);
+                pcl = (byte)((cpu.PC+2)&0x00ff);
+
+                cpu.JSR(addr);
+
+                Assert.AreEqual((byte)(s-2), cpu.S);
+
+                Assert.AreEqual(pcl, blankMemory[CPU6510.STACK_OFFSET + (byte)(cpu.S+1)]);
+                Assert.AreEqual(pch, blankMemory[CPU6510.STACK_OFFSET + (byte)(cpu.S+2)]);
+
+                Assert.AreEqual(addr, cpu.PC);
+            }
+        }
+
+        [Test]
+        public void testRTS()
+        {
+            ushort pc;
+            byte s;
+            byte[] blankMemory = new byte[65536];
+            Lock cpuLock = new AlwaysOpenLock();
+            CPU6510 cpu = new CPU6510(blankMemory, cpuLock);
+            Random rnd = new Random();
+
+            for (int i = 0; i < NUMBER_TEST_RUNS; i++)
+            {
+                s = (byte)rnd.Next(0x00, 0xff);
+                cpu.S  = s;
+                pc = (ushort)rnd.Next(0x0000, 0xffff);
+                cpu.push((byte)(pc>>8));
+                cpu.push((byte)(pc&0x00ff));
+
+                cpu.RTS();
+
+                Assert.AreEqual(s, cpu.S);
+                Assert.AreEqual((ushort)(pc+1), cpu.PC);
+            }
+        }
     }
 }

@@ -641,6 +641,36 @@ namespace MOS
             PCH = pop(lockToCycle:true);
         }
 
+        // JSR (short for "Jump to SubRoutine") is the mnemonic for a machine language instruction which calls a subroutine;
+        // for those familiar with BASIC programming, this is the machine language "equivalent" to GOSUB. It does this by first
+        // incrementing the program counter by two, pushing the result onto the stack, high-byte first (for retrieval when the
+        // subroutine is done and needs to hand back control to the calling part of the program), and then transfers program
+        // execution to the specified address, similar to JMP.
+        public void JSR(ushort address)
+        {
+            PC += 2;
+
+            push(PCH, lockToCycle:true);
+            push(PCL, lockToCycle:true);
+
+            PC = address;
+        }
+
+        // RTS (short for "ReTurn from Subroutine") is the mnemonic for a machine language instruction which returns the CPU
+        // from a subroutine to the part of the program which initially called the subroutine; for those familiar with BASIC
+        // programming, this is the machine language "equivalent" to RETURN.
+        // It does this by first pulling the "return address" from the stack – this address has already been incremented by
+        // two bytes by the JSR instruction used to call the subroutine, and now RTS increments it with yet another byte,
+        // making a total of three bytes (the length of the JSR instruction), and stores the result in the program counter.
+        // This ensures that upon returning from the subroutine, the CPU executes the instruction following the aforementioned JSR instruction.
+        public void RTS()
+        {
+            PCL = pop(lockToCycle:true);
+            PCH = pop(lockToCycle:true);
+
+            PC++;
+        }
+
         /* HELPERS */
         // Save byte to stack
         public void push(byte value, bool lockToCycle=true)
